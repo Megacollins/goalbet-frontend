@@ -117,6 +117,14 @@ function App() {
     }
   };
 
+  const disconnectWallet = () => {
+    setAccount(null);
+    setContract(null);
+    setMyBets([]);
+    setTxHash(null);
+    setError(null);
+  };
+
   const placeBet = async () => {
     if (!contract || !selectedMatch || selectedOutcome === null) return;
     try {
@@ -178,9 +186,14 @@ function App() {
           <span className="logo-badge">X Layer</span>
         </div>
         {account ? (
-          <div className="account">
-            <span className="account-dot"></span>
-            {account.slice(0, 6)}...{account.slice(-4)}
+          <div className="account-wrapper">
+            <div className="account">
+              <span className="account-dot"></span>
+              {account.slice(0, 6)}...{account.slice(-4)}
+            </div>
+            <button className="disconnect-btn" onClick={disconnectWallet}>
+              Disconnect
+            </button>
           </div>
         ) : (
           <button className="connect-btn" onClick={connectWallet}>

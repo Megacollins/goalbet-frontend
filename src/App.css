@@ -507,4 +507,24 @@ body {
 .claim-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}.account-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.disconnect-btn {
+  background: transparent;
+  color: #ff6b6b;
+  border: 1px solid #ff6b6b;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.disconnect-btn:hover {
+  background: #ff6b6b;
+  color: #fff;
 }

@@ -1,0 +1,510 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0a0a0a;
+  color: #ffffff;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  background: #111111;
+  border-bottom: 1px solid #222;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  font-size: 28px;
+}
+
+.logo-text {
+  font-size: 22px;
+  font-weight: 800;
+  color: #00ff88;
+}
+
+.logo-badge {
+  background: #1a1a2e;
+  color: #7b68ee;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  border: 1px solid #7b68ee;
+}
+
+.twitter-link {
+  color: #1d9bf0;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #1d9bf0;
+  padding: 4px 10px;
+  border-radius: 20px;
+  transition: all 0.2s;
+}
+
+.twitter-link:hover {
+  background: #1d9bf0;
+  color: #fff;
+}
+
+.connect-btn {
+  background: #00ff88;
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.connect-btn:hover {
+  background: #00cc6a;
+  transform: translateY(-1px);
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1a1a1a;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  border: 1px solid #333;
+}
+
+.account-dot {
+  width: 8px;
+  height: 8px;
+  background: #00ff88;
+  border-radius: 50%;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+  border-bottom: 1px solid #222;
+}
+
+.hero h1 {
+  font-size: 48px;
+  font-weight: 900;
+  background: linear-gradient(90deg, #00ff88, #7b68ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+
+.hero p {
+  font-size: 18px;
+  color: #888;
+  margin-bottom: 32px;
+}
+
+.hero-btn {
+  background: linear-gradient(90deg, #00ff88, #7b68ee);
+  color: #000;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.hero-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+}
+
+/* Banners */
+.error-banner {
+  background: #2d1b1b;
+  color: #ff6b6b;
+  padding: 12px 32px;
+  border-left: 4px solid #ff6b6b;
+  margin: 16px 32px;
+  border-radius: 4px;
+}
+
+.success-banner {
+  background: #1b2d1b;
+  color: #00ff88;
+  padding: 12px 32px;
+  border-left: 4px solid #00ff88;
+  margin: 16px 32px;
+  border-radius: 4px;
+}
+
+.success-banner a {
+  color: #00ff88;
+  margin-left: 8px;
+}
+
+/* Matches */
+.matches-section {
+  padding: 40px 32px;
+}
+
+.matches-section h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #ffffff;
+}
+
+.matches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.match-card {
+  background: #111111;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.match-card:hover {
+  border-color: #00ff88;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 255, 136, 0.1);
+}
+
+.match-card.selected {
+  border-color: #00ff88;
+  background: #0d1f0d;
+}
+
+.match-date {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.match-teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.flag {
+  width: 48px;
+  height: 36px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.team-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.vs {
+  font-size: 18px;
+  font-weight: 800;
+  color: #444;
+}
+
+.match-footer {
+  text-align: center;
+  font-size: 12px;
+  color: #555;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+}
+
+.modal {
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 32px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.modal h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.modal-match {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 16px;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.outcomes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.outcome-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #1a1a1a;
+  color: #fff;
+  border: 1px solid #333;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.outcome-btn:hover {
+  border-color: #00ff88;
+}
+
+.outcome-btn.active {
+  background: #0d1f0d;
+  border-color: #00ff88;
+  color: #00ff88;
+}
+
+.bet-input {
+  margin-bottom: 20px;
+}
+
+.bet-input label {
+  display: block;
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.bet-input input {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.place-bet-btn {
+  width: 100%;
+  background: linear-gradient(90deg, #00ff88, #7b68ee);
+  color: #000;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 16px;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+
+.place-bet-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  width: 100%;
+  background: transparent;
+  color: #666;
+  border: 1px solid #333;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 32px;
+  border-top: 1px solid #222;
+  color: #444;
+  font-size: 13px;
+  margin-top: 40px;
+}
+
+.footer-social {
+  margin-top: 8px;
+  color: #555;
+}
+
+.footer-social a {
+  color: #1d9bf0;
+  text-decoration: none;
+}
+
+.contract-addr {
+  margin-top: 8px;
+  font-size: 11px;
+  word-break: break-all;
+}
+
+/* My Bets */
+.bets-section {
+  padding: 0 32px 40px;
+}
+
+.bets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.bets-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.refresh-btn {
+  background: #1a1a1a;
+  color: #888;
+  border: 1px solid #333;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+  border-color: #00ff88;
+  color: #00ff88;
+}
+
+.bets-loading {
+  color: #555;
+  text-align: center;
+  padding: 40px;
+}
+
+.bets-empty {
+  color: #555;
+  text-align: center;
+  padding: 40px;
+  background: #111;
+  border: 1px dashed #333;
+  border-radius: 12px;
+}
+
+.bets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.bet-card {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.bet-match {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #222;
+}
+
+.bet-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.bet-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bet-label {
+  font-size: 12px;
+  color: #555;
+}
+
+.bet-value {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.claim-btn {
+  width: 100%;
+  background: linear-gradient(90deg, #00ff88, #7b68ee);
+  color: #000;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.claim-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

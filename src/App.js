@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ethers } from 'ethers';
 import './App.css';
 
@@ -21,8 +21,6 @@ const MATCHES = [
   { id: 5, teamA: "USA", teamB: "Mexico", date: "Jun 19, 2026", flagA: "us", flagB: "mx" },
   { id: 6, teamA: "Japan", teamB: "South Korea", date: "Jun 20, 2026", flagA: "jp", flagB: "kr" },
 ];
-
-const OUTCOME_LABELS = ["", "Team A Wins", "Draw", "Team B Wins"];
 
 const Flag = ({ code, alt }) => (
   <img

@@ -487,3 +487,27 @@
   font-size: 12px;
   border: 1px solid #333;
 }
+
+/* Mint Button */
+.admin-mint-btn {
+  align-self: flex-start;
+  background: linear-gradient(90deg, #7b68ee, #00ff88);
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.admin-mint-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-mint-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(123, 104, 238, 0.3);
+}

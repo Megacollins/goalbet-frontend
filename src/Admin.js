@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import './Admin.css';
 
 const PREDICTION_MARKET_ADDRESS = "0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278";
+const FAN_BADGE_ADDRESS = "0x9CC371D5a337cdbaE3e37B0b8EBD6E47f3101C9f";
 const OWNER_ADDRESS = "0x7d6c05edac00AF30054659aD65e10481bE3f4997";
 
 const PREDICTION_MARKET_ABI = [
@@ -14,7 +15,13 @@ const PREDICTION_MARKET_ABI = [
   "function resolveMarket(uint256,uint8)",
   "function withdrawFees()",
   "function getMarket(uint256) view returns (tuple(uint256 id, string teamA, string teamB, string matchDate, uint256 totalTeamA, uint256 totalDraw, uint256 totalTeamB, uint8 result, bool resolved, bool exists))",
-  "function getBet(uint256,address) view returns (tuple(uint256 amount, uint8 choice, bool claimed))"
+  "function getBet(uint256,address) view returns (tuple(uint256 amount, uint8 choice, bool claimed))",
+  "event BetPlaced(uint256 indexed marketId, address indexed bettor, uint8 choice, uint256 amount)"
+];
+
+const FAN_BADGE_ABI = [
+  "function mintBatch(address[] calldata _winners, uint256 _tokenId, uint256 _marketId) external",
+  "function mintWinnerBadge(address _winner, uint256 _tokenId, uint256 _marketId) external"
 ];
 
 const OUTCOME_NAMES = ["None", "Team A Wins", "Draw", "Team B Wins"];
@@ -23,6 +30,7 @@ function Admin() {
   const navigate = useNavigate();
   const [account, setAccount] = useState(null);
   const [contract, setContract] = useState(null);
+  const [fanBadgeContract, setFanBadgeContract] = useState(null);
   const [markets, setMarkets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -33,6 +41,7 @@ function Admin() {
   const [newMarket, setNewMarket] = useState({ teamA: '', teamB: '', date: '' });
   const [creatingMarket, setCreatingMarket] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [mintingId, setMintingId] = useState(null);
   const [hiddenMarkets, setHiddenMarkets] = useState(() => {
     const saved = localStorage.getItem('hiddenMarkets');
     return saved ? JSON.parse(saved) : [];
@@ -112,9 +121,15 @@ function Admin() {
         PREDICTION_MARKET_ABI,
         signer
       );
+      const badgeContract = new ethers.Contract(
+        FAN_BADGE_ADDRESS,
+        FAN_BADGE_ABI,
+        signer
+      );
       const connectedAccount = accounts[0];
       setAccount(connectedAccount);
       setContract(predictionContract);
+      setFanBadgeContract(badgeContract);
       if (connectedAccount.toLowerCase() === OWNER_ADDRESS.toLowerCase()) {
         setIsOwner(true);
         await fetchMarkets(predictionContract);
@@ -153,6 +168,55 @@ function Admin() {
       setError("Failed to resolve: " + err.message);
     } finally {
       setResolvingId(null);
+    }
+  };
+
+  const mintBadgesToWinners = async (market) => {
+    if (!contract || !fanBadgeContract) return;
+    try {
+      setMintingId(market.id);
+      setError(null);
+      setSuccess(null);
+
+      // Read BetPlaced events to find all bettors
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const readContract = new ethers.Contract(
+        PREDICTION_MARKET_ADDRESS,
+        PREDICTION_MARKET_ABI,
+        provider
+      );
+
+      const filter = readContract.filters.BetPlaced(market.id);
+      const events = await readContract.queryFilter(filter, 0, 'latest');
+
+      // Filter bettors who bet on the winning outcome
+      const winningOutcome = market.result;
+      const winners = events
+        .filter(e => Number(e.args.choice) === winningOutcome)
+        .map(e => e.args.bettor);
+
+      if (winners.length === 0) {
+        setError("No winners found for this market.");
+        return;
+      }
+
+      // Remove duplicates
+      const uniqueWinners = [...new Set(winners)];
+
+      // Mint badges to all winners in one transaction
+      const tx = await fanBadgeContract.mintBatch(
+        uniqueWinners,
+        winningOutcome,
+        market.id,
+        { gasLimit: 500000 }
+      );
+      await tx.wait();
+
+      setSuccess(`🎖 Minted badges to ${uniqueWinners.length} winner(s) for Market #${market.id}!`);
+    } catch (err) {
+      setError("Failed to mint badges: " + err.message);
+    } finally {
+      setMintingId(null);
     }
   };
 
@@ -369,6 +433,15 @@ function Admin() {
                               {resolvingId === market.id ? "..." : `🏆 ${market.teamB} Wins`}
                             </button>
                           </div>
+                        )}
+                        {market.resolved && (
+                          <button
+                            className="admin-mint-btn"
+                            onClick={() => mintBadgesToWinners(market)}
+                            disabled={mintingId === market.id}
+                          >
+                            {mintingId === market.id ? "Minting..." : "🎖 Mint Badges to Winners"}
+                          </button>
                         )}
                         <button
                           className={`admin-toggle-btn ${hiddenMarkets.includes(market.id) ? 'visible' : ''}`}

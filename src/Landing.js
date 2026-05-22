@@ -94,21 +94,11 @@ function Landing() {
           Both contracts are open source and verified on OKX Explorer.
         </p>
         <div className="landing-contract-list">
-          
-            href="https://www.okx.com/explorer/xlayer/address/0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278"
-            target="_blank"
-            rel="noreferrer"
-            className="landing-contract-item"
-          >
+          <a href="https://www.okx.com/explorer/xlayer/address/0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278" target="_blank" rel="noreferrer" className="landing-contract-item">
             <span className="landing-contract-name">PredictionMarket.sol</span>
             <span className="landing-contract-addr">0x0d8C...D278 ↗</span>
           </a>
-          
-            href="https://www.okx.com/explorer/xlayer/address/0x9CC371D5a337cdbaE3e37B0b8EBD6E47f3101C9f"
-            target="_blank"
-            rel="noreferrer"
-            className="landing-contract-item"
-          >
+          <a href="https://www.okx.com/explorer/xlayer/address/0x9CC371D5a337cdbaE3e37B0b8EBD6E47f3101C9f" target="_blank" rel="noreferrer" className="landing-contract-item">
             <span className="landing-contract-name">FanBadge.sol (ERC-1155)</span>
             <span className="landing-contract-addr">0x9CC3...C9f ↗</span>
           </a>

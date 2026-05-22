@@ -23,9 +23,7 @@ const FLAG_CODES = {
   "South Africa": "za"
 };
 
-const getFlag = (teamName) => {
-  return FLAG_CODES[teamName] || "un";
-};
+const getFlag = (teamName) => FLAG_CODES[teamName] || "un";
 
 const Flag = ({ code, alt }) => (
   <img
@@ -237,7 +235,6 @@ function App() {
 
   return (
     <div className="app">
-      {/* Header */}
       <header className="header">
         <div className="logo">
           <span className="logo-icon">⚽</span>
@@ -261,7 +258,6 @@ function App() {
         )}
       </header>
 
-      {/* Hero */}
       <div className="hero">
         <h1>World Cup 2026</h1>
         <p>Predict match outcomes. Stake OKB. Win NFT badges.</p>
@@ -272,17 +268,14 @@ function App() {
         )}
       </div>
 
-      {/* Error */}
       {error && <div className="error-banner">{error}</div>}
 
-      {/* Success */}
       {txHash && (
         <div className="success-banner">
           ✅ Bet placed! <a href={`https://www.okx.com/explorer/xlayer/tx/${txHash}`} target="_blank" rel="noreferrer">View on Explorer</a>
         </div>
       )}
 
-      {/* Matches */}
       <div className="matches-section">
         <h2>Upcoming Matches</h2>
         {loadingMarkets ? (
@@ -310,9 +303,21 @@ function App() {
                   </div>
                 </div>
                 <div className="match-pools">
-                  <span>{match.teamA}: {parseFloat(match.totalTeamA).toFixed(4)} OKB</span>
-                  <span>Draw: {parseFloat(match.totalDraw).toFixed(4)} OKB</span>
-                  <span>{match.teamB}: {parseFloat(match.totalTeamB).toFixed(4)} OKB</span>
+                  <div className="pool-item">
+                    <span className="pool-team">{match.teamA}</span>
+                    <span className="pool-amount">{parseFloat(match.totalTeamA).toFixed(4)}</span>
+                  </div>
+                  <div className="pool-item">
+                    <span className="pool-team">Draw</span>
+                    <span className="pool-amount">{parseFloat(match.totalDraw).toFixed(4)}</span>
+                  </div>
+                  <div className="pool-item">
+                    <span className="pool-team">{match.teamB}</span>
+                    <span className="pool-amount">{parseFloat(match.totalTeamB).toFixed(4)}</span>
+                  </div>
+                </div>
+                <div className="match-total-pool">
+                  Total Pool: {(parseFloat(match.totalTeamA) + parseFloat(match.totalDraw) + parseFloat(match.totalTeamB)).toFixed(4)} OKB
                 </div>
                 <div className="match-footer">Tap to predict</div>
               </div>
@@ -321,7 +326,6 @@ function App() {
         )}
       </div>
 
-      {/* My Bets */}
       {account && (
         <div className="bets-section">
           <div className="bets-header">
@@ -376,7 +380,6 @@ function App() {
         </div>
       )}
 
-      {/* Bet Modal */}
       {selectedMatch && (
         <div className="modal-overlay" onClick={() => setSelectedMatch(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
@@ -428,7 +431,6 @@ function App() {
         </div>
       )}
 
-      {/* Footer */}
       <footer className="footer">
         <p>Built on X Layer • Powered by OKB • World Cup 2026</p>
         <p className="footer-social">

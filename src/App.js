@@ -136,7 +136,6 @@ function App() {
         return;
       }
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-
       try {
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
@@ -156,7 +155,6 @@ function App() {
           });
         }
       }
-
       const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = web3Provider.getSigner();
       const predictionContract = new ethers.Contract(
@@ -164,7 +162,6 @@ function App() {
         PREDICTION_MARKET_ABI,
         signer
       );
-
       setAccount(accounts[0]);
       setContract(predictionContract);
       await fetchMyBets(predictionContract, accounts[0]);
@@ -302,22 +299,8 @@ function App() {
                     <span className="team-name">{match.teamB}</span>
                   </div>
                 </div>
-                <div className="match-pools">
-                  <div className="pool-item">
-                    <span className="pool-team">{match.teamA}</span>
-                    <span className="pool-amount">{parseFloat(match.totalTeamA).toFixed(4)}</span>
-                  </div>
-                  <div className="pool-item">
-                    <span className="pool-team">Draw</span>
-                    <span className="pool-amount">{parseFloat(match.totalDraw).toFixed(4)}</span>
-                  </div>
-                  <div className="pool-item">
-                    <span className="pool-team">{match.teamB}</span>
-                    <span className="pool-amount">{parseFloat(match.totalTeamB).toFixed(4)}</span>
-                  </div>
-                </div>
                 <div className="match-total-pool">
-                  Total Pool: {(parseFloat(match.totalTeamA) + parseFloat(match.totalDraw) + parseFloat(match.totalTeamB)).toFixed(4)} OKB
+                  💰 Pool: {(parseFloat(match.totalTeamA) + parseFloat(match.totalDraw) + parseFloat(match.totalTeamB)).toFixed(4)} OKB
                 </div>
                 <div className="match-footer">Tap to predict</div>
               </div>

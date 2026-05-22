@@ -439,3 +439,51 @@
   background: #ff6b6b;
   color: #fff;
 }
+
+/* Toggle & Hidden */
+.admin-market-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-toggle-btn {
+  align-self: flex-start;
+  background: transparent;
+  color: #888;
+  border: 1px solid #333;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.admin-toggle-btn:hover {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.admin-toggle-btn.visible {
+  color: #00ff88;
+  border-color: #00ff88;
+}
+
+.admin-toggle-btn.visible:hover {
+  background: #00ff88;
+  color: #000;
+}
+
+.hidden-market {
+  opacity: 0.5;
+  border-color: #1a1a1a !important;
+}
+
+.admin-hidden-badge {
+  background: #2a1a1a;
+  color: #888;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  border: 1px solid #333;
+}

@@ -33,6 +33,10 @@ function Admin() {
   const [newMarket, setNewMarket] = useState({ teamA: '', teamB: '', date: '' });
   const [creatingMarket, setCreatingMarket] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [hiddenMarkets, setHiddenMarkets] = useState(() => {
+    const saved = localStorage.getItem('hiddenMarkets');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const fetchMarkets = useCallback(async (contractInstance) => {
     try {
@@ -82,7 +86,6 @@ function Admin() {
         return;
       }
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-
       try {
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
@@ -102,7 +105,6 @@ function Admin() {
           });
         }
       }
-
       const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = web3Provider.getSigner();
       const predictionContract = new ethers.Contract(
@@ -110,11 +112,9 @@ function Admin() {
         PREDICTION_MARKET_ABI,
         signer
       );
-
       const connectedAccount = accounts[0];
       setAccount(connectedAccount);
       setContract(predictionContract);
-
       if (connectedAccount.toLowerCase() === OWNER_ADDRESS.toLowerCase()) {
         setIsOwner(true);
         await fetchMarkets(predictionContract);
@@ -126,6 +126,16 @@ function Admin() {
     } catch (err) {
       setError("Failed to connect: " + err.message);
     }
+  };
+
+  const toggleMarketVisibility = (marketId) => {
+    setHiddenMarkets(prev => {
+      const updated = prev.includes(marketId)
+        ? prev.filter(id => id !== marketId)
+        : [...prev, marketId];
+      localStorage.setItem('hiddenMarkets', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const resolveMarket = async (marketId, outcome) => {
@@ -301,11 +311,14 @@ function Admin() {
               ) : (
                 <div className="admin-markets">
                   {markets.map((market) => (
-                    <div key={market.id} className={`admin-market-card ${market.resolved ? 'resolved' : ''}`}>
+                    <div key={market.id} className={`admin-market-card ${market.resolved ? 'resolved' : ''} ${hiddenMarkets.includes(market.id) ? 'hidden-market' : ''}`}>
                       <div className="admin-market-header">
                         <span className="admin-market-id">#{market.id}</span>
                         <span className="admin-market-title">{market.teamA} vs {market.teamB}</span>
                         <span className="admin-market-date">📅 {market.date}</span>
+                        {hiddenMarkets.includes(market.id) && (
+                          <span className="admin-hidden-badge">🙈 Hidden</span>
+                        )}
                         {market.resolved ? (
                           <span className="admin-resolved-badge">✅ {OUTCOME_NAMES[market.result]}</span>
                         ) : (
@@ -330,32 +343,40 @@ function Admin() {
                           <strong>{market.totalPool} OKB</strong>
                         </div>
                       </div>
-                      {!market.resolved && (
-                        <div className="admin-resolve-btns">
-                          <p className="admin-resolve-label">Resolve as:</p>
-                          <button
-                            className="admin-resolve-btn team-a"
-                            onClick={() => resolveMarket(market.id, 1)}
-                            disabled={resolvingId === market.id}
-                          >
-                            {resolvingId === market.id ? "..." : `🏆 ${market.teamA} Wins`}
-                          </button>
-                          <button
-                            className="admin-resolve-btn draw"
-                            onClick={() => resolveMarket(market.id, 2)}
-                            disabled={resolvingId === market.id}
-                          >
-                            {resolvingId === market.id ? "..." : "🤝 Draw"}
-                          </button>
-                          <button
-                            className="admin-resolve-btn team-b"
-                            onClick={() => resolveMarket(market.id, 3)}
-                            disabled={resolvingId === market.id}
-                          >
-                            {resolvingId === market.id ? "..." : `🏆 ${market.teamB} Wins`}
-                          </button>
-                        </div>
-                      )}
+                      <div className="admin-market-actions">
+                        {!market.resolved && (
+                          <div className="admin-resolve-btns">
+                            <p className="admin-resolve-label">Resolve as:</p>
+                            <button
+                              className="admin-resolve-btn team-a"
+                              onClick={() => resolveMarket(market.id, 1)}
+                              disabled={resolvingId === market.id}
+                            >
+                              {resolvingId === market.id ? "..." : `🏆 ${market.teamA} Wins`}
+                            </button>
+                            <button
+                              className="admin-resolve-btn draw"
+                              onClick={() => resolveMarket(market.id, 2)}
+                              disabled={resolvingId === market.id}
+                            >
+                              {resolvingId === market.id ? "..." : "🤝 Draw"}
+                            </button>
+                            <button
+                              className="admin-resolve-btn team-b"
+                              onClick={() => resolveMarket(market.id, 3)}
+                              disabled={resolvingId === market.id}
+                            >
+                              {resolvingId === market.id ? "..." : `🏆 ${market.teamB} Wins`}
+                            </button>
+                          </div>
+                        )}
+                        <button
+                          className={`admin-toggle-btn ${hiddenMarkets.includes(market.id) ? 'visible' : ''}`}
+                          onClick={() => toggleMarketVisibility(market.id)}
+                        >
+                          {hiddenMarkets.includes(market.id) ? '👁 Show in App' : '🙈 Hide from App'}
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

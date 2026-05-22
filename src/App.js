@@ -60,9 +60,10 @@ function App() {
       );
       const count = await readContract.marketCount();
       const marketList = [];
+      const hidden = JSON.parse(localStorage.getItem('hiddenMarkets') || '[]');
       for (let i = 1; i <= Number(count); i++) {
         const market = await readContract.getMarket(i);
-        if (!market.resolved) {
+        if (!market.resolved && !hidden.includes(Number(market.id))) {
           marketList.push({
             id: Number(market.id),
             teamA: market.teamA,

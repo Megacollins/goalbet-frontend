@@ -79,7 +79,7 @@ function Admin() {
 
   const fetchContractBalance = useCallback(async () => {
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.providers.JsonRpcProvider("https://rpc.xlayer.tech");
       const balance = await provider.getBalance(PREDICTION_MARKET_ADDRESS);
       setContractBalance(ethers.utils.formatEther(balance));
     } catch (err) {
@@ -178,8 +178,7 @@ function Admin() {
       setError(null);
       setSuccess(null);
 
-      // Read BetPlaced events to find all bettors
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.providers.JsonRpcProvider("https://rpc.xlayer.tech");
       const readContract = new ethers.Contract(
         PREDICTION_MARKET_ADDRESS,
         PREDICTION_MARKET_ABI,
@@ -189,7 +188,6 @@ function Admin() {
       const filter = readContract.filters.BetPlaced(market.id);
       const events = await readContract.queryFilter(filter, 0, 'latest');
 
-      // Filter bettors who bet on the winning outcome
       const winningOutcome = market.result;
       const winners = events
         .filter(e => Number(e.args.choice) === winningOutcome)
@@ -200,10 +198,8 @@ function Admin() {
         return;
       }
 
-      // Remove duplicates
       const uniqueWinners = [...new Set(winners)];
 
-      // Mint badges to all winners in one transaction
       const tx = await fanBadgeContract.mintBatch(
         uniqueWinners,
         winningOutcome,

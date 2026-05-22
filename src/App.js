@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ethers } from 'ethers';
 import './App.css';
 
@@ -13,14 +13,19 @@ const PREDICTION_MARKET_ABI = [
   "function getBet(uint256,address) view returns (tuple(uint256 amount, uint8 choice, bool claimed))"
 ];
 
-const MATCHES = [
-  { id: 1, teamA: "Brazil", teamB: "Argentina", date: "Jun 15, 2026", flagA: "br", flagB: "ar" },
-  { id: 2, teamA: "France", teamB: "England", date: "Jun 16, 2026", flagA: "fr", flagB: "gb-eng" },
-  { id: 3, teamA: "Germany", teamB: "Spain", date: "Jun 17, 2026", flagA: "de", flagB: "es" },
-  { id: 4, teamA: "Portugal", teamB: "Morocco", date: "Jun 18, 2026", flagA: "pt", flagB: "ma" },
-  { id: 5, teamA: "USA", teamB: "Mexico", date: "Jun 19, 2026", flagA: "us", flagB: "mx" },
-  { id: 6, teamA: "Japan", teamB: "South Korea", date: "Jun 20, 2026", flagA: "jp", flagB: "kr" },
-];
+const FLAG_CODES = {
+  "Brazil": "br", "Argentina": "ar", "France": "fr", "England": "gb-eng",
+  "Germany": "de", "Spain": "es", "Portugal": "pt", "Morocco": "ma",
+  "USA": "us", "Mexico": "mx", "Japan": "jp", "South Korea": "kr",
+  "Italy": "it", "Netherlands": "nl", "Belgium": "be", "Croatia": "hr",
+  "Uruguay": "uy", "Colombia": "co", "Ecuador": "ec", "Senegal": "sn",
+  "Ghana": "gh", "Cameroon": "cm", "Nigeria": "ng", "Australia": "au",
+  "South Africa": "za"
+};
+
+const getFlag = (teamName) => {
+  return FLAG_CODES[teamName] || "un";
+};
 
 const Flag = ({ code, alt }) => (
   <img
@@ -43,19 +48,72 @@ function App() {
   const [myBets, setMyBets] = useState([]);
   const [loadingBets, setLoadingBets] = useState(false);
   const [claimingId, setClaimingId] = useState(null);
+  const [markets, setMarkets] = useState([]);
+  const [loadingMarkets, setLoadingMarkets] = useState(true);
+
+  const fetchMarkets = useCallback(async () => {
+    try {
+      setLoadingMarkets(true);
+      const provider = new ethers.providers.JsonRpcProvider("https://rpc.xlayer.tech");
+      const readContract = new ethers.Contract(
+        PREDICTION_MARKET_ADDRESS,
+        PREDICTION_MARKET_ABI,
+        provider
+      );
+      const count = await readContract.marketCount();
+      const marketList = [];
+      for (let i = 1; i <= Number(count); i++) {
+        const market = await readContract.getMarket(i);
+        if (!market.resolved) {
+          marketList.push({
+            id: Number(market.id),
+            teamA: market.teamA,
+            teamB: market.teamB,
+            date: market.matchDate,
+            flagA: getFlag(market.teamA),
+            flagB: getFlag(market.teamB),
+            totalTeamA: ethers.utils.formatEther(market.totalTeamA),
+            totalDraw: ethers.utils.formatEther(market.totalDraw),
+            totalTeamB: ethers.utils.formatEther(market.totalTeamB),
+          });
+        }
+      }
+      setMarkets(marketList);
+    } catch (err) {
+      console.error("Error fetching markets:", err);
+    } finally {
+      setLoadingMarkets(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMarkets();
+  }, [fetchMarkets]);
 
   const fetchMyBets = useCallback(async (contractInstance, userAccount) => {
     if (!contractInstance || !userAccount) return;
     try {
       setLoadingBets(true);
+      const provider = new ethers.providers.JsonRpcProvider("https://rpc.xlayer.tech");
+      const readContract = new ethers.Contract(
+        PREDICTION_MARKET_ADDRESS,
+        PREDICTION_MARKET_ABI,
+        provider
+      );
+      const count = await readContract.marketCount();
       const bets = [];
-      for (const match of MATCHES) {
-        const bet = await contractInstance.getBet(match.id, userAccount);
+      for (let i = 1; i <= Number(count); i++) {
+        const bet = await contractInstance.getBet(i, userAccount);
         if (bet.amount.toString() !== "0") {
-          const market = await contractInstance.getMarket(match.id);
+          const market = await readContract.getMarket(i);
           bets.push({
-            matchId: match.id,
-            match,
+            matchId: i,
+            match: {
+              teamA: market.teamA,
+              teamB: market.teamB,
+              flagA: getFlag(market.teamA),
+              flagB: getFlag(market.teamB),
+            },
             amount: ethers.utils.formatEther(bet.amount),
             choice: Number(bet.choice),
             claimed: bet.claimed,
@@ -141,6 +199,7 @@ function App() {
       setSelectedMatch(null);
       setSelectedOutcome(null);
       await fetchMyBets(contract, account);
+      await fetchMarkets();
     } catch (err) {
       setError("Transaction failed: " + err.message);
     } finally {
@@ -226,29 +285,40 @@ function App() {
       {/* Matches */}
       <div className="matches-section">
         <h2>Upcoming Matches</h2>
-        <div className="matches-grid">
-          {MATCHES.map((match) => (
-            <div
-              key={match.id}
-              className={`match-card ${selectedMatch?.id === match.id ? 'selected' : ''}`}
-              onClick={() => { setSelectedMatch(match); setSelectedOutcome(null); }}
-            >
-              <div className="match-date">📅 {match.date}</div>
-              <div className="match-teams">
-                <div className="team">
-                  <Flag code={match.flagA} alt={match.teamA} />
-                  <span className="team-name">{match.teamA}</span>
+        {loadingMarkets ? (
+          <div style={{ color: '#555', textAlign: 'center', padding: '40px' }}>Loading matches from blockchain...</div>
+        ) : markets.length === 0 ? (
+          <div style={{ color: '#555', textAlign: 'center', padding: '40px' }}>No active markets available.</div>
+        ) : (
+          <div className="matches-grid">
+            {markets.map((match) => (
+              <div
+                key={match.id}
+                className={`match-card ${selectedMatch?.id === match.id ? 'selected' : ''}`}
+                onClick={() => { setSelectedMatch(match); setSelectedOutcome(null); }}
+              >
+                <div className="match-date">📅 {match.date}</div>
+                <div className="match-teams">
+                  <div className="team">
+                    <Flag code={match.flagA} alt={match.teamA} />
+                    <span className="team-name">{match.teamA}</span>
+                  </div>
+                  <div className="vs">VS</div>
+                  <div className="team">
+                    <Flag code={match.flagB} alt={match.teamB} />
+                    <span className="team-name">{match.teamB}</span>
+                  </div>
                 </div>
-                <div className="vs">VS</div>
-                <div className="team">
-                  <Flag code={match.flagB} alt={match.teamB} />
-                  <span className="team-name">{match.teamB}</span>
+                <div className="match-pools">
+                  <span>{match.teamA}: {parseFloat(match.totalTeamA).toFixed(4)} OKB</span>
+                  <span>Draw: {parseFloat(match.totalDraw).toFixed(4)} OKB</span>
+                  <span>{match.teamB}: {parseFloat(match.totalTeamB).toFixed(4)} OKB</span>
                 </div>
+                <div className="match-footer">Tap to predict</div>
               </div>
-              <div className="match-footer">Tap to predict</div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* My Bets */}

@@ -185,11 +185,24 @@ function Admin() {
         provider
       );
 
-      const filter = readContract.filters.BetPlaced(market.id);
-      const events = await readContract.queryFilter(filter, 0, 'latest');
+      const currentBlock = await provider.getBlockNumber();
+      const chunkSize = 99;
+      const startBlock = Math.max(0, currentBlock - 100000);
+
+      let allEvents = [];
+      for (let from = startBlock; from <= currentBlock; from += chunkSize) {
+        const to = Math.min(from + chunkSize - 1, currentBlock);
+        try {
+          const filter = readContract.filters.BetPlaced(market.id);
+          const events = await readContract.queryFilter(filter, from, to);
+          allEvents = [...allEvents, ...events];
+        } catch (e) {
+          console.log(`Skipping block range ${from}-${to}`);
+        }
+      }
 
       const winningOutcome = market.result;
-      const winners = events
+      const winners = allEvents
         .filter(e => Number(e.args.choice) === winningOutcome)
         .map(e => e.args.bettor);
 

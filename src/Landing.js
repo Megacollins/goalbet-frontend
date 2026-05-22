@@ -8,7 +8,6 @@ function Landing() {
   return (
     <div className="landing">
 
-      {/* Nav */}
       <nav className="landing-nav">
         <div className="landing-logo">
           <span>⚽</span>
@@ -23,7 +22,6 @@ function Landing() {
         </div>
       </nav>
 
-      {/* Hero */}
       <section className="landing-hero">
         <p className="landing-hero-tag">Built on X Layer · World Cup 2026</p>
         <h1>
@@ -31,7 +29,7 @@ function Landing() {
           <span className="landing-hero-highlight">where your mouth is.</span>
         </h1>
         <p className="landing-hero-sub">
-          GoalBet lets you stake OKB on World Cup match outcomes — 
+          GoalBet lets you stake OKB on World Cup match outcomes —
           no bookies, no middlemen, just you and the blockchain.
           Win and take home OKB payouts plus a limited NFT badge.
         </p>
@@ -40,7 +38,6 @@ function Landing() {
         </button>
       </section>
 
-      {/* How it works */}
       <section className="landing-how">
         <p className="landing-section-tag">How it works</p>
         <h2>Three steps. That's it.</h2>
@@ -52,7 +49,7 @@ function Landing() {
           </div>
           <div className="landing-step">
             <span className="landing-step-num">2</span>
-            <h3>Pick a match & stake OKB</h3>
+            <h3>Pick a match and stake OKB</h3>
             <p>Choose any upcoming World Cup game. Pick Team A, Draw, or Team B. Stake as little as 0.001 OKB.</p>
           </div>
           <div className="landing-step">
@@ -63,35 +60,33 @@ function Landing() {
         </div>
       </section>
 
-      {/* What makes it different */}
       <section className="landing-different">
         <p className="landing-section-tag">Why GoalBet</p>
         <h2>No account. No KYC.<br />Just a wallet.</h2>
         <div className="landing-cards">
           <div className="landing-card">
             <h3>Transparent by default</h3>
-            <p>Every bet, every payout, every market is on-chain. 
+            <p>Every bet, every payout, every market is on-chain.
                You can verify anything on the OKX Explorer anytime.</p>
           </div>
           <div className="landing-card">
             <h3>Winners get badges</h3>
-            <p>Correct predictions earn you ERC-1155 NFT badges. 
+            <p>Correct predictions earn you ERC-1155 NFT badges.
                Call 3 matches right and you unlock the World Cup Prophet badge.</p>
           </div>
           <div className="landing-card">
             <h3>Fair payouts</h3>
-            <p>Winners split 95% of the pool proportionally to their stake. 
+            <p>Winners split 95% of the pool proportionally to their stake.
                5% goes to platform fees. Simple math, no surprises.</p>
           </div>
           <div className="landing-card">
             <h3>Real World Cup matches</h3>
-            <p>Markets are created from live fixture data automatically. 
+            <p>Markets are created from live fixture data automatically.
                New matches go live as the tournament progresses.</p>
           </div>
         </div>
       </section>
 
-      {/* Contracts */}
       <section className="landing-contracts">
         <p className="landing-section-tag">On-chain</p>
         <h2>Verified on X Layer</h2>
@@ -120,7 +115,6 @@ function Landing() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="landing-cta">
         <h2>The World Cup is happening.<br />Are you in?</h2>
         <button className="landing-launch-btn" onClick={() => navigate('/app')}>
@@ -131,7 +125,6 @@ function Landing() {
         </p>
       </section>
 
-      {/* Footer */}
       <footer className="landing-footer">
         <div className="landing-footer-left">
           <span>⚽ GoalBet</span>

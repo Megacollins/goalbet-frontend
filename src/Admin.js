@@ -1,0 +1,377 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { ethers } from 'ethers';
+import { useNavigate } from 'react-router-dom';
+import './Admin.css';
+
+const PREDICTION_MARKET_ADDRESS = "0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278";
+const OWNER_ADDRESS = "0x7d6c05edac00AF30054659aD65e10481bE3f4997";
+
+const PREDICTION_MARKET_ABI = [
+  "function marketCount() view returns (uint256)",
+  "function createMarket(string,string,string) returns (uint256)",
+  "function placeBet(uint256,uint8) payable",
+  "function claimWinnings(uint256)",
+  "function resolveMarket(uint256,uint8)",
+  "function withdrawFees()",
+  "function getMarket(uint256) view returns (tuple(uint256 id, string teamA, string teamB, string matchDate, uint256 totalTeamA, uint256 totalDraw, uint256 totalTeamB, uint8 result, bool resolved, bool exists))",
+  "function getBet(uint256,address) view returns (tuple(uint256 amount, uint8 choice, bool claimed))"
+];
+
+const OUTCOME_NAMES = ["None", "Team A Wins", "Draw", "Team B Wins"];
+
+function Admin() {
+  const navigate = useNavigate();
+  const [account, setAccount] = useState(null);
+  const [contract, setContract] = useState(null);
+  const [markets, setMarkets] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [resolvingId, setResolvingId] = useState(null);
+  const [withdrawing, setWithdrawing] = useState(false);
+  const [contractBalance, setContractBalance] = useState("0");
+  const [newMarket, setNewMarket] = useState({ teamA: '', teamB: '', date: '' });
+  const [creatingMarket, setCreatingMarket] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+
+  const fetchMarkets = useCallback(async (contractInstance) => {
+    try {
+      setLoading(true);
+      const count = await contractInstance.marketCount();
+      const marketList = [];
+      for (let i = 1; i <= Number(count); i++) {
+        const market = await contractInstance.getMarket(i);
+        marketList.push({
+          id: Number(market.id),
+          teamA: market.teamA,
+          teamB: market.teamB,
+          date: market.matchDate,
+          totalTeamA: ethers.utils.formatEther(market.totalTeamA),
+          totalDraw: ethers.utils.formatEther(market.totalDraw),
+          totalTeamB: ethers.utils.formatEther(market.totalTeamB),
+          totalPool: ethers.utils.formatEther(
+            market.totalTeamA.add(market.totalDraw).add(market.totalTeamB)
+          ),
+          result: Number(market.result),
+          resolved: market.resolved,
+        });
+      }
+      setMarkets(marketList);
+    } catch (err) {
+      setError("Failed to fetch markets: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchContractBalance = useCallback(async () => {
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const balance = await provider.getBalance(PREDICTION_MARKET_ADDRESS);
+      setContractBalance(ethers.utils.formatEther(balance));
+    } catch (err) {
+      console.error("Error fetching balance:", err);
+    }
+  }, []);
+
+  const connectWallet = async () => {
+    try {
+      setError(null);
+      if (!window.ethereum) {
+        setError("Please install OKX Wallet!");
+        return;
+      }
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0xC4' }],
+        });
+      } catch (switchError) {
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: '0xC4',
+              chainName: 'X Layer Mainnet',
+              nativeCurrency: { name: 'OKB', symbol: 'OKB', decimals: 18 },
+              rpcUrls: ['https://rpc.xlayer.tech'],
+              blockExplorerUrls: ['https://www.okx.com/explorer/xlayer'],
+            }],
+          });
+        }
+      }
+
+      const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = web3Provider.getSigner();
+      const predictionContract = new ethers.Contract(
+        PREDICTION_MARKET_ADDRESS,
+        PREDICTION_MARKET_ABI,
+        signer
+      );
+
+      const connectedAccount = accounts[0];
+      setAccount(connectedAccount);
+      setContract(predictionContract);
+
+      if (connectedAccount.toLowerCase() === OWNER_ADDRESS.toLowerCase()) {
+        setIsOwner(true);
+        await fetchMarkets(predictionContract);
+        await fetchContractBalance();
+      } else {
+        setIsOwner(false);
+        setError("Access denied. This panel is only for the contract owner.");
+      }
+    } catch (err) {
+      setError("Failed to connect: " + err.message);
+    }
+  };
+
+  const resolveMarket = async (marketId, outcome) => {
+    if (!contract) return;
+    try {
+      setResolvingId(marketId);
+      setError(null);
+      setSuccess(null);
+      const tx = await contract.resolveMarket(marketId, outcome, { gasLimit: 300000 });
+      await tx.wait();
+      setSuccess(`✅ Market ${marketId} resolved as ${OUTCOME_NAMES[outcome]}!`);
+      await fetchMarkets(contract);
+      await fetchContractBalance();
+    } catch (err) {
+      setError("Failed to resolve: " + err.message);
+    } finally {
+      setResolvingId(null);
+    }
+  };
+
+  const withdrawFees = async () => {
+    if (!contract) return;
+    try {
+      setWithdrawing(true);
+      setError(null);
+      setSuccess(null);
+      const tx = await contract.withdrawFees({ gasLimit: 300000 });
+      await tx.wait();
+      setSuccess("✅ Fees withdrawn successfully!");
+      await fetchContractBalance();
+    } catch (err) {
+      setError("Failed to withdraw: " + err.message);
+    } finally {
+      setWithdrawing(false);
+    }
+  };
+
+  const createMarket = async () => {
+    if (!contract || !newMarket.teamA || !newMarket.teamB || !newMarket.date) return;
+    try {
+      setCreatingMarket(true);
+      setError(null);
+      setSuccess(null);
+      const tx = await contract.createMarket(newMarket.teamA, newMarket.teamB, newMarket.date, { gasLimit: 300000 });
+      await tx.wait();
+      setSuccess(`✅ Market created: ${newMarket.teamA} vs ${newMarket.teamB}!`);
+      setNewMarket({ teamA: '', teamB: '', date: '' });
+      await fetchMarkets(contract);
+    } catch (err) {
+      setError("Failed to create market: " + err.message);
+    } finally {
+      setCreatingMarket(false);
+    }
+  };
+
+  return (
+    <div className="admin-app">
+      {/* Header */}
+      <header className="admin-header">
+        <div className="admin-logo">
+          <span>⚽</span>
+          <span className="admin-logo-text">GoalBet</span>
+          <span className="admin-badge">Admin Panel</span>
+        </div>
+        <div className="admin-header-right">
+          {account && (
+            <span className="admin-account">
+              {isOwner ? "👑 Owner" : "⛔ Not Owner"} — {account.slice(0, 6)}...{account.slice(-4)}
+            </span>
+          )}
+          <button className="admin-back-btn" onClick={() => navigate('/')}>
+            ← Back to App
+          </button>
+        </div>
+      </header>
+
+      <div className="admin-content">
+        {!account ? (
+          <div className="admin-connect">
+            <div className="admin-connect-card">
+              <h2>🔐 Admin Access</h2>
+              <p>Connect your owner wallet to access the admin panel.</p>
+              <button className="admin-connect-btn" onClick={connectWallet}>
+                Connect OKX Wallet
+              </button>
+            </div>
+          </div>
+        ) : !isOwner ? (
+          <div className="admin-connect">
+            <div className="admin-connect-card">
+              <h2>⛔ Access Denied</h2>
+              <p>Only the contract owner can access this panel.</p>
+              <p className="admin-owner-addr">Owner: {OWNER_ADDRESS}</p>
+              <button className="admin-back-btn" onClick={() => navigate('/')}>
+                ← Back to App
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Stats Bar */}
+            <div className="admin-stats">
+              <div className="admin-stat">
+                <span className="stat-label">Total Markets</span>
+                <span className="stat-value">{markets.length}</span>
+              </div>
+              <div className="admin-stat">
+                <span className="stat-label">Active Markets</span>
+                <span className="stat-value">{markets.filter(m => !m.resolved).length}</span>
+              </div>
+              <div className="admin-stat">
+                <span className="stat-label">Resolved Markets</span>
+                <span className="stat-value">{markets.filter(m => m.resolved).length}</span>
+              </div>
+              <div className="admin-stat">
+                <span className="stat-label">Contract Balance</span>
+                <span className="stat-value">{parseFloat(contractBalance).toFixed(4)} OKB</span>
+              </div>
+            </div>
+
+            {/* Error/Success */}
+            {error && <div className="admin-error">{error}</div>}
+            {success && <div className="admin-success">{success}</div>}
+
+            {/* Withdraw Fees */}
+            <div className="admin-section">
+              <h2>💰 Fees</h2>
+              <div className="admin-fees-card">
+                <p>Available to withdraw: <strong>{parseFloat(contractBalance).toFixed(4)} OKB</strong></p>
+                <button
+                  className="admin-withdraw-btn"
+                  onClick={withdrawFees}
+                  disabled={withdrawing || parseFloat(contractBalance) === 0}
+                >
+                  {withdrawing ? "Withdrawing..." : "Withdraw All Fees"}
+                </button>
+              </div>
+            </div>
+
+            {/* Create Market */}
+            <div className="admin-section">
+              <h2>➕ Create New Market</h2>
+              <div className="admin-create-card">
+                <div className="admin-create-form">
+                  <input
+                    className="admin-input"
+                    placeholder="Team A (e.g. Brazil)"
+                    value={newMarket.teamA}
+                    onChange={e => setNewMarket({ ...newMarket, teamA: e.target.value })}
+                  />
+                  <input
+                    className="admin-input"
+                    placeholder="Team B (e.g. Argentina)"
+                    value={newMarket.teamB}
+                    onChange={e => setNewMarket({ ...newMarket, teamB: e.target.value })}
+                  />
+                  <input
+                    className="admin-input"
+                    placeholder="Match Date (e.g. Jun 25, 2026)"
+                    value={newMarket.date}
+                    onChange={e => setNewMarket({ ...newMarket, date: e.target.value })}
+                  />
+                  <button
+                    className="admin-create-btn"
+                    onClick={createMarket}
+                    disabled={creatingMarket || !newMarket.teamA || !newMarket.teamB || !newMarket.date}
+                  >
+                    {creatingMarket ? "Creating..." : "Create Market"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Markets */}
+            <div className="admin-section">
+              <h2>🏟️ Markets</h2>
+              {loading ? (
+                <div className="admin-loading">Loading markets...</div>
+              ) : (
+                <div className="admin-markets">
+                  {markets.map((market) => (
+                    <div key={market.id} className={`admin-market-card ${market.resolved ? 'resolved' : ''}`}>
+                      <div className="admin-market-header">
+                        <span className="admin-market-id">#{market.id}</span>
+                        <span className="admin-market-title">{market.teamA} vs {market.teamB}</span>
+                        <span className="admin-market-date">📅 {market.date}</span>
+                        {market.resolved ? (
+                          <span className="admin-resolved-badge">✅ {OUTCOME_NAMES[market.result]}</span>
+                        ) : (
+                          <span className="admin-active-badge">🟢 Active</span>
+                        )}
+                      </div>
+                      <div className="admin-market-stats">
+                        <div className="admin-market-stat">
+                          <span>{market.teamA} Wins</span>
+                          <strong>{market.totalTeamA} OKB</strong>
+                        </div>
+                        <div className="admin-market-stat">
+                          <span>Draw</span>
+                          <strong>{market.totalDraw} OKB</strong>
+                        </div>
+                        <div className="admin-market-stat">
+                          <span>{market.teamB} Wins</span>
+                          <strong>{market.totalTeamB} OKB</strong>
+                        </div>
+                        <div className="admin-market-stat total">
+                          <span>Total Pool</span>
+                          <strong>{market.totalPool} OKB</strong>
+                        </div>
+                      </div>
+                      {!market.resolved && (
+                        <div className="admin-resolve-btns">
+                          <p className="admin-resolve-label">Resolve as:</p>
+                          <button
+                            className="admin-resolve-btn team-a"
+                            onClick={() => resolveMarket(market.id, 1)}
+                            disabled={resolvingId === market.id}
+                          >
+                            {resolvingId === market.id ? "..." : `🏆 ${market.teamA} Wins`}
+                          </button>
+                          <button
+                            className="admin-resolve-btn draw"
+                            onClick={() => resolveMarket(market.id, 2)}
+                            disabled={resolvingId === market.id}
+                          >
+                            {resolvingId === market.id ? "..." : "🤝 Draw"}
+                          </button>
+                          <button
+                            className="admin-resolve-btn team-b"
+                            onClick={() => resolveMarket(market.id, 3)}
+                            disabled={resolvingId === market.id}
+                          >
+                            {resolvingId === market.id ? "..." : `🏆 ${market.teamB} Wins`}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default Admin;

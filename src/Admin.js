@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ethers } from 'ethers';
 import { useNavigate } from 'react-router-dom';
 import './Admin.css';
@@ -183,7 +183,6 @@ function Admin() {
 
   return (
     <div className="admin-app">
-      {/* Header */}
       <header className="admin-header">
         <div className="admin-logo">
           <span>⚽</span>
@@ -226,7 +225,6 @@ function Admin() {
           </div>
         ) : (
           <>
-            {/* Stats Bar */}
             <div className="admin-stats">
               <div className="admin-stat">
                 <span className="stat-label">Total Markets</span>
@@ -246,11 +244,9 @@ function Admin() {
               </div>
             </div>
 
-            {/* Error/Success */}
             {error && <div className="admin-error">{error}</div>}
             {success && <div className="admin-success">{success}</div>}
 
-            {/* Withdraw Fees */}
             <div className="admin-section">
               <h2>💰 Fees</h2>
               <div className="admin-fees-card">
@@ -265,7 +261,6 @@ function Admin() {
               </div>
             </div>
 
-            {/* Create Market */}
             <div className="admin-section">
               <h2>➕ Create New Market</h2>
               <div className="admin-create-card">
@@ -299,7 +294,6 @@ function Admin() {
               </div>
             </div>
 
-            {/* Markets */}
             <div className="admin-section">
               <h2>🏟️ Markets</h2>
               {loading ? (

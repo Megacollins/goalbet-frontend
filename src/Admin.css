@@ -511,3 +511,59 @@
   transform: translateY(-1px);
   box-shadow: 0 4px 15px rgba(123, 104, 238, 0.3);
 }
+
+/* AI Agent */
+.admin-agent-card {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.admin-agent-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.admin-agent-info p {
+  color: #888;
+  font-size: 14px;
+  max-width: 600px;
+}
+
+.admin-agent-btn {
+  background: linear-gradient(90deg, #7b68ee, #00ff88);
+  color: #000;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.admin-agent-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.admin-agent-logs {
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  border-radius: 8px;
+  padding: 16px;
+  font-family: monospace;
+  font-size: 13px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.admin-agent-log {
+  color: #00ff88;
+  padding: 3px 0;
+  line-height: 1.5;
+}

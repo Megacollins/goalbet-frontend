@@ -6,6 +6,7 @@ import './Admin.css';
 const PREDICTION_MARKET_ADDRESS = "0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278";
 const FAN_BADGE_ADDRESS = "0x9CC371D5a337cdbaE3e37B0b8EBD6E47f3101C9f";
 const OWNER_ADDRESS = "0x7d6c05edac00AF30054659aD65e10481bE3f4997";
+const API_TOKEN = "6bb3d2c6d73a4191a79f1a2a0db98b48";
 
 const PREDICTION_MARKET_ABI = [
   "function marketCount() view returns (uint256)",
@@ -26,6 +27,11 @@ const FAN_BADGE_ABI = [
 
 const OUTCOME_NAMES = ["None", "Team A Wins", "Draw", "Team B Wins"];
 
+function formatDate(dateStr) {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
 function Admin() {
   const navigate = useNavigate();
   const [account, setAccount] = useState(null);
@@ -42,10 +48,14 @@ function Admin() {
   const [creatingMarket, setCreatingMarket] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [mintingId, setMintingId] = useState(null);
+  const [agentRunning, setAgentRunning] = useState(false);
+  const [agentLogs, setAgentLogs] = useState([]);
   const [hiddenMarkets, setHiddenMarkets] = useState(() => {
     const saved = localStorage.getItem('hiddenMarkets');
     return saved ? JSON.parse(saved) : [];
   });
+
+  const addLog = (msg) => setAgentLogs(prev => [...prev, msg]);
 
   const fetchMarkets = useCallback(async (contractInstance) => {
     try {
@@ -143,6 +153,92 @@ function Admin() {
     }
   };
 
+  const runAIAgent = async () => {
+    if (!contract) return;
+    try {
+      setAgentRunning(true);
+      setAgentLogs([]);
+      setError(null);
+      setSuccess(null);
+
+      addLog("🤖 AI Agent starting...");
+      addLog("🌍 Fetching World Cup 2026 fixtures from API...");
+
+      // Fetch fixtures
+      const response = await fetch(
+        "https://api.football-data.org/v4/competitions/WC/matches?status=SCHEDULED",
+        { headers: { "X-Auth-Token": API_TOKEN } }
+      );
+
+      if (!response.ok) throw new Error(`API error: ${response.status}`);
+
+      const data = await response.json();
+      const matches = (data.matches || []).filter(
+        m => m.homeTeam.name && m.awayTeam.name
+      );
+
+      addLog(`✅ Found ${matches.length} upcoming fixtures`);
+      addLog("🔗 Reading existing markets from contract...");
+
+      // Get existing markets
+      const count = await contract.marketCount();
+      const existingMarkets = [];
+      for (let i = 1; i <= Number(count); i++) {
+        const market = await contract.getMarket(i);
+        existingMarkets.push({ teamA: market.teamA, teamB: market.teamB });
+      }
+
+      addLog(`✅ Found ${existingMarkets.length} existing markets on-chain`);
+
+      // Find new fixtures
+      const newFixtures = matches.filter(m => {
+        const tA = m.homeTeam.name;
+        const tB = m.awayTeam.name;
+        return !existingMarkets.some(
+          em => em.teamA && em.teamB && (
+            (em.teamA.toLowerCase() === tA.toLowerCase() && em.teamB.toLowerCase() === tB.toLowerCase()) ||
+            (em.teamA.toLowerCase() === tB.toLowerCase() && em.teamB.toLowerCase() === tA.toLowerCase())
+          )
+        );
+      }).slice(0, 5);
+
+      if (newFixtures.length === 0) {
+        addLog("✅ All fixtures already have markets. Nothing to do!");
+        setSuccess("✅ Agent finished — all fixtures already on-chain!");
+        return;
+      }
+
+      addLog(`📋 Found ${newFixtures.length} new fixtures to create`);
+      addLog("🚀 Creating markets on-chain...");
+
+      let created = 0;
+      for (const match of newFixtures) {
+        const teamA = match.homeTeam.name;
+        const teamB = match.awayTeam.name;
+        const date = formatDate(match.utcDate);
+        addLog(`⚽ Creating: ${teamA} vs ${teamB} — ${date}`);
+        try {
+          const tx = await contract.createMarket(teamA, teamB, date, { gasLimit: 300000 });
+          await tx.wait();
+          addLog(`✅ Created! TX: ${tx.hash.slice(0, 20)}...`);
+          created++;
+        } catch (err) {
+          addLog(`❌ Failed: ${err.message.slice(0, 60)}`);
+        }
+      }
+
+      addLog(`🎉 Agent finished! ${created} new markets created.`);
+      setSuccess(`🤖 AI Agent created ${created} new markets!`);
+      await fetchMarkets(contract);
+
+    } catch (err) {
+      setError("Agent error: " + err.message);
+      addLog("❌ Agent error: " + err.message);
+    } finally {
+      setAgentRunning(false);
+    }
+  };
+
   const toggleMarketVisibility = (marketId) => {
     setHiddenMarkets(prev => {
       const updated = prev.includes(marketId)
@@ -212,7 +308,6 @@ function Admin() {
       }
 
       const uniqueWinners = [...new Set(winners)];
-
       const tx = await fanBadgeContract.mintBatch(
         uniqueWinners,
         winningOutcome,
@@ -220,7 +315,6 @@ function Admin() {
         { gasLimit: 500000 }
       );
       await tx.wait();
-
       setSuccess(`🎖 Minted badges to ${uniqueWinners.length} winner(s) for Market #${market.id}!`);
     } catch (err) {
       setError("Failed to mint badges: " + err.message);
@@ -329,6 +423,30 @@ function Admin() {
 
             {error && <div className="admin-error">{error}</div>}
             {success && <div className="admin-success">{success}</div>}
+
+            {/* AI Agent Section */}
+            <div className="admin-section">
+              <h2>🤖 AI Agent</h2>
+              <div className="admin-agent-card">
+                <div className="admin-agent-info">
+                  <p>Automatically fetches live World Cup 2026 fixtures and creates prediction markets on-chain.</p>
+                  <button
+                    className="admin-agent-btn"
+                    onClick={runAIAgent}
+                    disabled={agentRunning}
+                  >
+                    {agentRunning ? "🔄 Agent Running..." : "🤖 Run AI Agent"}
+                  </button>
+                </div>
+                {agentLogs.length > 0 && (
+                  <div className="admin-agent-logs">
+                    {agentLogs.map((log, i) => (
+                      <div key={i} className="admin-agent-log">{log}</div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
 
             <div className="admin-section">
               <h2>💰 Fees</h2>

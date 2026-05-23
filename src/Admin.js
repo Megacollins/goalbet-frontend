@@ -164,9 +164,8 @@ function Admin() {
       addLog("🤖 AI Agent starting...");
       addLog("🌍 Fetching World Cup 2026 fixtures from API...");
 
-      // Fetch fixtures
       const response = await fetch(
-        "https://api.football-data.org/v4/competitions/WC/matches?status=SCHEDULED",
+        `https://corsproxy.io/?https://api.football-data.org/v4/competitions/WC/matches?status=SCHEDULED`,
         { headers: { "X-Auth-Token": API_TOKEN } }
       );
 
@@ -180,7 +179,6 @@ function Admin() {
       addLog(`✅ Found ${matches.length} upcoming fixtures`);
       addLog("🔗 Reading existing markets from contract...");
 
-      // Get existing markets
       const count = await contract.marketCount();
       const existingMarkets = [];
       for (let i = 1; i <= Number(count); i++) {
@@ -190,7 +188,6 @@ function Admin() {
 
       addLog(`✅ Found ${existingMarkets.length} existing markets on-chain`);
 
-      // Find new fixtures
       const newFixtures = matches.filter(m => {
         const tA = m.homeTeam.name;
         const tB = m.awayTeam.name;
@@ -424,7 +421,6 @@ function Admin() {
             {error && <div className="admin-error">{error}</div>}
             {success && <div className="admin-success">{success}</div>}
 
-            {/* AI Agent Section */}
             <div className="admin-section">
               <h2>🤖 AI Agent</h2>
               <div className="admin-agent-card">

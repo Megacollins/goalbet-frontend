@@ -164,14 +164,14 @@ function Admin() {
       addLog("🤖 AI Agent starting...");
       addLog("🌍 Fetching World Cup 2026 fixtures from API...");
 
-      const response = await fetch(
-        `https://corsproxy.io/?https://api.football-data.org/v4/competitions/WC/matches?status=SCHEDULED`,
-        { headers: { "X-Auth-Token": API_TOKEN } }
-      );
+      const targetUrl = `https://api.football-data.org/v4/competitions/WC/matches?status=SCHEDULED`;
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
 
+      const response = await fetch(proxyUrl);
       if (!response.ok) throw new Error(`API error: ${response.status}`);
 
-      const data = await response.json();
+      const proxyData = await response.json();
+      const data = JSON.parse(proxyData.contents);
       const matches = (data.matches || []).filter(
         m => m.homeTeam.name && m.awayTeam.name
       );

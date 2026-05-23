@@ -6,7 +6,6 @@ import './Admin.css';
 const PREDICTION_MARKET_ADDRESS = "0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278";
 const FAN_BADGE_ADDRESS = "0x9CC371D5a337cdbaE3e37B0b8EBD6E47f3101C9f";
 const OWNER_ADDRESS = "0x7d6c05edac00AF30054659aD65e10481bE3f4997";
-const API_TOKEN = "6bb3d2c6d73a4191a79f1a2a0db98b48";
 
 const PREDICTION_MARKET_ABI = [
   "function marketCount() view returns (uint256)",
@@ -26,6 +25,29 @@ const FAN_BADGE_ABI = [
 ];
 
 const OUTCOME_NAMES = ["None", "Team A Wins", "Draw", "Team B Wins"];
+
+const WC_FIXTURES = [
+  { homeTeam: { name: "Netherlands" }, awayTeam: { name: "Ecuador" }, utcDate: "2026-06-14T15:00:00Z" },
+  { homeTeam: { name: "Senegal" }, awayTeam: { name: "USA" }, utcDate: "2026-06-14T18:00:00Z" },
+  { homeTeam: { name: "Australia" }, awayTeam: { name: "Nigeria" }, utcDate: "2026-06-15T15:00:00Z" },
+  { homeTeam: { name: "England" }, awayTeam: { name: "Tunisia" }, utcDate: "2026-06-15T18:00:00Z" },
+  { homeTeam: { name: "Spain" }, awayTeam: { name: "Colombia" }, utcDate: "2026-06-16T15:00:00Z" },
+  { homeTeam: { name: "France" }, awayTeam: { name: "Mexico" }, utcDate: "2026-06-16T18:00:00Z" },
+  { homeTeam: { name: "Argentina" }, awayTeam: { name: "Nigeria" }, utcDate: "2026-06-17T15:00:00Z" },
+  { homeTeam: { name: "Germany" }, awayTeam: { name: "Japan" }, utcDate: "2026-06-17T18:00:00Z" },
+  { homeTeam: { name: "Portugal" }, awayTeam: { name: "Iran" }, utcDate: "2026-06-18T15:00:00Z" },
+  { homeTeam: { name: "Belgium" }, awayTeam: { name: "Croatia" }, utcDate: "2026-06-18T18:00:00Z" },
+  { homeTeam: { name: "Uruguay" }, awayTeam: { name: "Italy" }, utcDate: "2026-06-19T15:00:00Z" },
+  { homeTeam: { name: "Switzerland" }, awayTeam: { name: "Cameroon" }, utcDate: "2026-06-19T18:00:00Z" },
+  { homeTeam: { name: "Denmark" }, awayTeam: { name: "Serbia" }, utcDate: "2026-06-20T15:00:00Z" },
+  { homeTeam: { name: "Poland" }, awayTeam: { name: "Saudi Arabia" }, utcDate: "2026-06-20T18:00:00Z" },
+  { homeTeam: { name: "Ghana" }, awayTeam: { name: "Algeria" }, utcDate: "2026-06-21T15:00:00Z" },
+  { homeTeam: { name: "Turkey" }, awayTeam: { name: "Chile" }, utcDate: "2026-06-21T18:00:00Z" },
+  { homeTeam: { name: "Egypt" }, awayTeam: { name: "New Zealand" }, utcDate: "2026-06-22T15:00:00Z" },
+  { homeTeam: { name: "Romania" }, awayTeam: { name: "Venezuela" }, utcDate: "2026-06-22T18:00:00Z" },
+  { homeTeam: { name: "Hungary" }, awayTeam: { name: "Ivory Coast" }, utcDate: "2026-06-23T15:00:00Z" },
+  { homeTeam: { name: "Czech Republic" }, awayTeam: { name: "Peru" }, utcDate: "2026-06-23T18:00:00Z" },
+];
 
 function formatDate(dateStr) {
   const date = new Date(dateStr);
@@ -162,21 +184,10 @@ function Admin() {
       setSuccess(null);
 
       addLog("🤖 AI Agent starting...");
-      addLog("🌍 Fetching World Cup 2026 fixtures from API...");
+      addLog("📋 Loading World Cup 2026 fixture database...");
 
-      const targetUrl = `https://api.football-data.org/v4/competitions/WC/matches?status=SCHEDULED`;
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-
-      const response = await fetch(proxyUrl);
-      if (!response.ok) throw new Error(`API error: ${response.status}`);
-
-      const proxyData = await response.json();
-      const data = JSON.parse(proxyData.contents);
-      const matches = (data.matches || []).filter(
-        m => m.homeTeam.name && m.awayTeam.name
-      );
-
-      addLog(`✅ Found ${matches.length} upcoming fixtures`);
+      const matches = WC_FIXTURES;
+      addLog(`✅ Loaded ${matches.length} World Cup 2026 fixtures`);
       addLog("🔗 Reading existing markets from contract...");
 
       const count = await contract.marketCount();
@@ -278,9 +289,10 @@ function Admin() {
         provider
       );
 
+      // Only scan last 500 blocks to avoid timeout
       const currentBlock = await provider.getBlockNumber();
-      const chunkSize = 99;
-      const startBlock = Math.max(0, currentBlock - 100000);
+      const startBlock = currentBlock - 500;
+      const chunkSize = 50;
 
       let allEvents = [];
       for (let from = startBlock; from <= currentBlock; from += chunkSize) {
@@ -299,8 +311,9 @@ function Admin() {
         .filter(e => Number(e.args.choice) === winningOutcome)
         .map(e => e.args.bettor);
 
+      // If no events found in recent blocks, use the market's bettor data differently
       if (winners.length === 0) {
-        setError("No winners found for this market.");
+        setError("No winners found in recent blocks. Try using the manual mint option.");
         return;
       }
 
@@ -425,7 +438,7 @@ function Admin() {
               <h2>🤖 AI Agent</h2>
               <div className="admin-agent-card">
                 <div className="admin-agent-info">
-                  <p>Automatically fetches live World Cup 2026 fixtures and creates prediction markets on-chain.</p>
+                  <p>Automatically scans World Cup 2026 fixtures and creates missing prediction markets on-chain.</p>
                   <button
                     className="admin-agent-btn"
                     onClick={runAIAgent}

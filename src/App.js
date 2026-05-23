@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { ethers } from 'ethers';
+import { useNavigate } from 'react-router-dom';
 import './App.css';
 
 const PREDICTION_MARKET_ADDRESS = "0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278";
@@ -39,6 +40,7 @@ const Flag = ({ code, alt }) => (
 );
 
 function App() {
+  const navigate = useNavigate();
   const [account, setAccount] = useState(null);
   const [contract, setContract] = useState(null);
   const [selectedMatch, setSelectedMatch] = useState(null);
@@ -129,13 +131,10 @@ function App() {
           };
 
           if (!market.resolved) {
-            // Unresolved — show in active bets
             activeBets.push(betData);
           } else if (Number(bet.choice) === Number(market.result)) {
-            // Won — show in active bets (can claim)
             activeBets.push(betData);
           } else {
-            // Lost — show in history
             historyBets.push(betData);
           }
         }
@@ -291,7 +290,7 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <div className="logo">
+        <div className="logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           <span className="logo-icon">⚽</span>
           <span className="logo-text">GoalBet</span>
           <span className="logo-badge">X Layer</span>
@@ -369,7 +368,6 @@ function App() {
 
       {account && (
         <>
-          {/* Active Bets */}
           <div className="bets-section">
             <div className="bets-header">
               <h2>My Bets</h2>
@@ -390,7 +388,6 @@ function App() {
             )}
           </div>
 
-          {/* Bet History */}
           {pastBets.length > 0 && (
             <div className="bets-section">
               <div className="bets-header">

@@ -17,9 +17,7 @@ function Landing() {
         <div className="landing-nav-links">
           <a href="https://x.com/GoalBetApp" target="_blank" rel="noreferrer">Twitter</a>
           <a href="https://github.com/Megacollins/goalbet-frontend" target="_blank" rel="noreferrer">GitHub</a>
-          <button className="landing-launch-btn-sm" onClick={() => navigate('/app')}>
-            Open App
-          </button>
+          <button className="landing-launch-btn-sm" onClick={() => navigate('/app')}>Open App</button>
         </div>
       </nav>
 
@@ -30,26 +28,14 @@ function Landing() {
             <span className="landing-live-dot" />
             LIVE · World Cup 2026
           </div>
-          <h1>
-            The smartest way to<br />
-            <span className="landing-hero-highlight">predict football.</span>
-          </h1>
+          <h1>The smartest way to<br /><span className="landing-hero-highlight">predict football.</span></h1>
           <p className="landing-hero-sub">
             On-chain prediction markets for World Cup 2026.
             Stake OKB, call the result, collect your winnings — no middlemen, no bookies.
           </p>
           <div className="landing-hero-actions">
-            <button className="landing-launch-btn" onClick={() => navigate('/app')}>
-              Start Predicting
-            </button>
-            
-              className="landing-ghost-btn"
-              href="https://www.okx.com/explorer/xlayer/address/0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278"
-              target="_blank"
-              rel="noreferrer"
-            >
-              View Contract
-            </a>
+            <button className="landing-launch-btn" onClick={() => navigate('/app')}>Start Predicting</button>
+            <a className="landing-ghost-btn" href="https://www.okx.com/explorer/xlayer/address/0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278" target="_blank" rel="noreferrer">View Contract</a>
           </div>
         </div>
 
@@ -57,52 +43,25 @@ function Landing() {
           <div className="landing-odds-card">
             <div className="landing-odds-match">Brazil vs Argentina</div>
             <div className="landing-odds-row">
-              <div className="landing-odds-item active">
-                <span>Brazil</span>
-                <strong>2.10</strong>
-              </div>
-              <div className="landing-odds-item">
-                <span>Draw</span>
-                <strong>3.40</strong>
-              </div>
-              <div className="landing-odds-item">
-                <span>Argentina</span>
-                <strong>2.80</strong>
-              </div>
+              <div className="landing-odds-item active"><span>Brazil</span><strong>2.10</strong></div>
+              <div className="landing-odds-item"><span>Draw</span><strong>3.40</strong></div>
+              <div className="landing-odds-item"><span>Argentina</span><strong>2.80</strong></div>
             </div>
           </div>
           <div className="landing-odds-card landing-odds-card-2">
             <div className="landing-odds-match">France vs England</div>
             <div className="landing-odds-row">
-              <div className="landing-odds-item">
-                <span>France</span>
-                <strong>1.90</strong>
-              </div>
-              <div className="landing-odds-item">
-                <span>Draw</span>
-                <strong>3.20</strong>
-              </div>
-              <div className="landing-odds-item active">
-                <span>England</span>
-                <strong>3.10</strong>
-              </div>
+              <div className="landing-odds-item"><span>France</span><strong>1.90</strong></div>
+              <div className="landing-odds-item"><span>Draw</span><strong>3.20</strong></div>
+              <div className="landing-odds-item active"><span>England</span><strong>3.10</strong></div>
             </div>
           </div>
           <div className="landing-odds-card landing-odds-card-3">
             <div className="landing-odds-match">Germany vs Spain</div>
             <div className="landing-odds-row">
-              <div className="landing-odds-item">
-                <span>Germany</span>
-                <strong>2.40</strong>
-              </div>
-              <div className="landing-odds-item active">
-                <span>Draw</span>
-                <strong>3.10</strong>
-              </div>
-              <div className="landing-odds-item">
-                <span>Spain</span>
-                <strong>2.20</strong>
-              </div>
+              <div className="landing-odds-item"><span>Germany</span><strong>2.40</strong></div>
+              <div className="landing-odds-item active"><span>Draw</span><strong>3.10</strong></div>
+              <div className="landing-odds-item"><span>Spain</span><strong>2.20</strong></div>
             </div>
           </div>
         </div>
@@ -197,9 +156,7 @@ function Landing() {
       <section className="landing-contracts">
         <p className="landing-section-tag">Transparent</p>
         <h2>Verified on X Layer</h2>
-        <p className="landing-contracts-sub">
-          Both contracts are open source and verified on OKX Explorer.
-        </p>
+        <p className="landing-contracts-sub">Both contracts are open source and verified on OKX Explorer.</p>
         <div className="landing-contract-list">
           <a href="https://www.okx.com/explorer/xlayer/address/0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278" target="_blank" rel="noreferrer" className="landing-contract-item">
             <div>
@@ -222,9 +179,7 @@ function Landing() {
         <div className="landing-cta-glow" />
         <h2>The World Cup is here. Are you in?</h2>
         <p>No sign up. No KYC. Just connect your OKX Wallet and start predicting.</p>
-        <button className="landing-launch-btn" onClick={() => navigate('/app')}>
-          Start Predicting
-        </button>
+        <button className="landing-launch-btn" onClick={() => navigate('/app')}>Start Predicting</button>
       </section>
 
       <footer className="landing-footer">

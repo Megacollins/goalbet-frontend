@@ -20,7 +20,11 @@ const FLAG_CODES = {
   "Italy": "it", "Netherlands": "nl", "Belgium": "be", "Croatia": "hr",
   "Uruguay": "uy", "Colombia": "co", "Ecuador": "ec", "Senegal": "sn",
   "Ghana": "gh", "Cameroon": "cm", "Nigeria": "ng", "Australia": "au",
-  "South Africa": "za"
+  "South Africa": "za", "Tunisia": "tn", "Iran": "ir", "Serbia": "rs",
+  "Denmark": "dk", "Poland": "pl", "Saudi Arabia": "sa", "Algeria": "dz",
+  "Turkey": "tr", "Chile": "cl", "Egypt": "eg", "New Zealand": "nz",
+  "Romania": "ro", "Venezuela": "ve", "Hungary": "hu", "Peru": "pe",
+  "Ivory Coast": "ci", "Czech Republic": "cz"
 };
 
 const getFlag = (teamName) => FLAG_CODES[teamName] || "un";
@@ -44,10 +48,12 @@ function App() {
   const [txHash, setTxHash] = useState(null);
   const [error, setError] = useState(null);
   const [myBets, setMyBets] = useState([]);
+  const [pastBets, setPastBets] = useState([]);
   const [loadingBets, setLoadingBets] = useState(false);
   const [claimingId, setClaimingId] = useState(null);
   const [markets, setMarkets] = useState([]);
   const [loadingMarkets, setLoadingMarkets] = useState(true);
+  const [showHistory, setShowHistory] = useState(false);
 
   const fetchMarkets = useCallback(async () => {
     try {
@@ -100,12 +106,14 @@ function App() {
         provider
       );
       const count = await readContract.marketCount();
-      const bets = [];
+      const activeBets = [];
+      const historyBets = [];
+
       for (let i = 1; i <= Number(count); i++) {
         const bet = await contractInstance.getBet(i, userAccount);
         if (bet.amount.toString() !== "0") {
           const market = await readContract.getMarket(i);
-          bets.push({
+          const betData = {
             matchId: i,
             match: {
               teamA: market.teamA,
@@ -118,10 +126,22 @@ function App() {
             claimed: bet.claimed,
             resolved: market.resolved,
             result: Number(market.result),
-          });
+          };
+
+          if (!market.resolved) {
+            // Unresolved — show in active bets
+            activeBets.push(betData);
+          } else if (Number(bet.choice) === Number(market.result)) {
+            // Won — show in active bets (can claim)
+            activeBets.push(betData);
+          } else {
+            // Lost — show in history
+            historyBets.push(betData);
+          }
         }
       }
-      setMyBets(bets);
+      setMyBets(activeBets);
+      setPastBets(historyBets);
     } catch (err) {
       console.error("Error fetching bets:", err);
     } finally {
@@ -175,6 +195,7 @@ function App() {
     setAccount(null);
     setContract(null);
     setMyBets([]);
+    setPastBets([]);
     setTxHash(null);
     setError(null);
   };
@@ -229,6 +250,42 @@ function App() {
     if (choice === 2) return "Draw";
     if (choice === 3) return `${match.teamB} Wins`;
     return "Unknown";
+  };
+
+  const BetCard = ({ bet, showClaim = false }) => {
+    const status = getBetStatus(bet);
+    return (
+      <div className={`bet-card ${bet.resolved && bet.choice !== bet.result ? 'bet-card-lost' : ''}`}>
+        <div className="bet-match">
+          <Flag code={bet.match.flagA} alt={bet.match.teamA} />
+          <span>{bet.match.teamA} vs {bet.match.teamB}</span>
+          <Flag code={bet.match.flagB} alt={bet.match.teamB} />
+        </div>
+        <div className="bet-details">
+          <div className="bet-row">
+            <span className="bet-label">Your Pick</span>
+            <span className="bet-value">{getOutcomeLabel(bet.choice, bet.match)}</span>
+          </div>
+          <div className="bet-row">
+            <span className="bet-label">Amount</span>
+            <span className="bet-value">{bet.amount} OKB</span>
+          </div>
+          <div className="bet-row">
+            <span className="bet-label">Status</span>
+            <span className="bet-value" style={{ color: status.color }}>{status.label}</span>
+          </div>
+        </div>
+        {showClaim && bet.resolved && bet.choice === bet.result && !bet.claimed && (
+          <button
+            className="claim-btn"
+            onClick={() => claimWinnings(bet.matchId)}
+            disabled={claimingId === bet.matchId}
+          >
+            {claimingId === bet.matchId ? "Claiming..." : "💰 Claim Winnings"}
+          </button>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -311,57 +368,55 @@ function App() {
       </div>
 
       {account && (
-        <div className="bets-section">
-          <div className="bets-header">
-            <h2>My Bets</h2>
-            <button className="refresh-btn" onClick={() => fetchMyBets(contract, account)}>
-              🔄 Refresh
-            </button>
+        <>
+          {/* Active Bets */}
+          <div className="bets-section">
+            <div className="bets-header">
+              <h2>My Bets</h2>
+              <button className="refresh-btn" onClick={() => fetchMyBets(contract, account)}>
+                🔄 Refresh
+              </button>
+            </div>
+            {loadingBets ? (
+              <div className="bets-loading">Loading your bets...</div>
+            ) : myBets.length === 0 ? (
+              <div className="bets-empty">No active bets. Pick a match above! ⚽</div>
+            ) : (
+              <div className="bets-grid">
+                {myBets.map((bet) => (
+                  <BetCard key={bet.matchId} bet={bet} showClaim={true} />
+                ))}
+              </div>
+            )}
           </div>
-          {loadingBets ? (
-            <div className="bets-loading">Loading your bets...</div>
-          ) : myBets.length === 0 ? (
-            <div className="bets-empty">No bets placed yet. Pick a match above! ⚽</div>
-          ) : (
-            <div className="bets-grid">
-              {myBets.map((bet) => {
-                const status = getBetStatus(bet);
-                return (
-                  <div key={bet.matchId} className="bet-card">
-                    <div className="bet-match">
-                      <Flag code={bet.match.flagA} alt={bet.match.teamA} />
-                      <span>{bet.match.teamA} vs {bet.match.teamB}</span>
-                      <Flag code={bet.match.flagB} alt={bet.match.teamB} />
-                    </div>
-                    <div className="bet-details">
-                      <div className="bet-row">
-                        <span className="bet-label">Your Pick</span>
-                        <span className="bet-value">{getOutcomeLabel(bet.choice, bet.match)}</span>
-                      </div>
-                      <div className="bet-row">
-                        <span className="bet-label">Amount</span>
-                        <span className="bet-value">{bet.amount} OKB</span>
-                      </div>
-                      <div className="bet-row">
-                        <span className="bet-label">Status</span>
-                        <span className="bet-value" style={{ color: status.color }}>{status.label}</span>
-                      </div>
-                    </div>
-                    {bet.resolved && bet.choice === bet.result && !bet.claimed && (
-                      <button
-                        className="claim-btn"
-                        onClick={() => claimWinnings(bet.matchId)}
-                        disabled={claimingId === bet.matchId}
-                      >
-                        {claimingId === bet.matchId ? "Claiming..." : "💰 Claim Winnings"}
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
+
+          {/* Bet History */}
+          {pastBets.length > 0 && (
+            <div className="bets-section">
+              <div className="bets-header">
+                <h2>Bet History</h2>
+                <button
+                  className="refresh-btn"
+                  onClick={() => setShowHistory(!showHistory)}
+                >
+                  {showHistory ? '🙈 Hide' : '👁 Show'}
+                </button>
+              </div>
+              {showHistory && (
+                <div className="bets-grid">
+                  {pastBets.map((bet) => (
+                    <BetCard key={bet.matchId} bet={bet} showClaim={false} />
+                  ))}
+                </div>
+              )}
+              {!showHistory && (
+                <div className="bets-empty" style={{ cursor: 'pointer' }} onClick={() => setShowHistory(true)}>
+                  {pastBets.length} past bet{pastBets.length > 1 ? 's' : ''} — click Show to view
+                </div>
+              )}
             </div>
           )}
-        </div>
+        </>
       )}
 
       {selectedMatch && (

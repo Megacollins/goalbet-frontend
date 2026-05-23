@@ -11,7 +11,6 @@
   font-family: 'Segoe UI', sans-serif;
 }
 
-/* Nav */
 .landing-nav {
   display: flex;
   justify-content: space-between;
@@ -65,7 +64,6 @@
   background: #00cc6a;
 }
 
-/* Hero */
 .landing-hero {
   padding: 100px 48px 80px;
   max-width: 760px;
@@ -117,7 +115,6 @@
   transform: translateY(-1px);
 }
 
-/* Section tags */
 .landing-section-tag {
   font-size: 12px;
   color: #00ff88;
@@ -126,7 +123,6 @@
   margin-bottom: 12px;
 }
 
-/* How it works */
 .landing-how {
   padding: 80px 48px;
   border-bottom: 1px solid #151515;
@@ -178,7 +174,6 @@
   line-height: 1.7;
 }
 
-/* Why GoalBet */
 .landing-different {
   padding: 80px 48px;
   border-bottom: 1px solid #151515;
@@ -224,7 +219,6 @@
   line-height: 1.7;
 }
 
-/* Contracts */
 .landing-contracts {
   padding: 80px 48px;
   border-bottom: 1px solid #151515;
@@ -278,7 +272,6 @@
   font-family: monospace;
 }
 
-/* CTA */
 .landing-cta {
   padding: 100px 48px;
   border-bottom: 1px solid #151515;
@@ -298,7 +291,6 @@
   color: #555;
 }
 
-/* Footer */
 .landing-footer {
   display: flex;
   justify-content: space-between;

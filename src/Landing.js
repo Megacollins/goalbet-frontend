@@ -1,604 +1,246 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.landing {
-  min-height: 100vh;
-  background: #080808;
-  color: #ffffff;
-  font-family: 'Segoe UI', sans-serif;
-  overflow-x: hidden;
-}
-
-/* Nav */
-.landing-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 48px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  position: sticky;
-  top: 0;
-  background: rgba(8,8,8,0.95);
-  backdrop-filter: blur(12px);
-  z-index: 100;
-}
-
-.landing-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 20px;
-  font-weight: 800;
-}
-
-.landing-logo-text {
-  color: #00ff88;
-}
-
-.landing-logo-tag {
-  background: rgba(0,255,136,0.1);
-  color: #00ff88;
-  border: 1px solid rgba(0,255,136,0.3);
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-}
-
-.landing-nav-links {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-}
-
-.landing-nav-links a {
-  color: #555;
-  text-decoration: none;
-  font-size: 14px;
-  transition: color 0.2s;
-}
-
-.landing-nav-links a:hover {
-  color: #fff;
-}
-
-.landing-launch-btn-sm {
-  background: #00ff88;
-  color: #000;
-  border: none;
-  padding: 9px 20px;
-  border-radius: 6px;
-  font-weight: 700;
-  cursor: pointer;
-  font-size: 13px;
-  transition: all 0.2s;
-}
-
-.landing-launch-btn-sm:hover {
-  background: #00cc6a;
-}
-
-/* Hero */
-.landing-hero {
-  position: relative;
-  padding: 80px 48px 60px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 48px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  overflow: hidden;
-  min-height: 600px;
-  background:
-    radial-gradient(ellipse at 20% 50%, rgba(0,255,136,0.04) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(123,104,238,0.06) 0%, transparent 60%),
-    #080808;
-}
-
-.landing-hero-glow {
-  position: absolute;
-  top: -100px;
-  left: -100px;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(0,255,136,0.06) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.landing-hero-content {
-  flex: 1;
-  max-width: 580px;
-  padding-top: 20px;
-}
-
-.landing-live-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(0,255,136,0.08);
-  border: 1px solid rgba(0,255,136,0.2);
-  color: #00ff88;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  margin-bottom: 28px;
-}
-
-.landing-live-dot {
-  width: 7px;
-  height: 7px;
-  background: #00ff88;
-  border-radius: 50%;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.8); }
-}
-
-.landing-hero h1 {
-  font-size: 56px;
-  font-weight: 900;
-  line-height: 1.1;
-  margin-bottom: 24px;
-  color: #fff;
-  letter-spacing: -0.02em;
-}
-
-.landing-hero-highlight {
-  color: #00ff88;
-}
-
-.landing-hero-sub {
-  font-size: 17px;
-  color: #666;
-  line-height: 1.7;
-  margin-bottom: 40px;
-  max-width: 480px;
-}
-
-.landing-hero-actions {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-}
-
-.landing-launch-btn {
-  background: #00ff88;
-  color: #000;
-  border: none;
-  padding: 14px 32px;
-  border-radius: 8px;
-  font-weight: 800;
-  cursor: pointer;
-  font-size: 15px;
-  transition: all 0.2s;
-  display: inline-block;
-  text-decoration: none;
-}
-
-.landing-launch-btn:hover {
-  background: #00cc6a;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(0,255,136,0.25);
-}
-
-.landing-ghost-btn {
-  color: #555;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-  border: 1px solid #222;
-  padding: 14px 24px;
-  border-radius: 8px;
-  transition: all 0.2s;
-}
-
-.landing-ghost-btn:hover {
-  border-color: #444;
-  color: #fff;
-}
-
-/* Odds Cards */
-.landing-odds-cards {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: 340px;
-  padding-top: 10px;
-}
-
-.landing-odds-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  padding: 16px 18px;
-  backdrop-filter: blur(10px);
-  transition: all 0.2s;
-}
-
-.landing-odds-card:hover {
-  border-color: rgba(0,255,136,0.2);
-  background: rgba(255,255,255,0.05);
-}
-
-.landing-odds-card-2 {
-  opacity: 0.85;
-  transform: translateX(12px);
-}
-
-.landing-odds-card-3 {
-  opacity: 0.65;
-  transform: translateX(24px);
-}
-
-.landing-odds-match {
-  font-size: 13px;
-  color: #888;
-  margin-bottom: 12px;
-  font-weight: 600;
-}
-
-.landing-odds-row {
-  display: flex;
-  gap: 8px;
-}
-
-.landing-odds-item {
-  flex: 1;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 8px;
-  padding: 10px 8px;
-  text-align: center;
-  transition: all 0.2s;
-}
-
-.landing-odds-item.active {
-  background: rgba(0,255,136,0.08);
-  border-color: rgba(0,255,136,0.25);
-}
-
-.landing-odds-item span {
-  display: block;
-  font-size: 10px;
-  color: #555;
-  margin-bottom: 4px;
-}
-
-.landing-odds-item.active span {
-  color: #00ff88;
-}
-
-.landing-odds-item strong {
-  font-size: 15px;
-  color: #fff;
-  font-weight: 700;
-}
-
-.landing-odds-item.active strong {
-  color: #00ff88;
-}
-
-/* Stats Bar */
-.landing-stats-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  padding: 24px 48px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  background: rgba(255,255,255,0.01);
-}
-
-.landing-stat-item {
-  text-align: center;
-  padding: 0 40px;
-}
-
-.landing-stat-num {
-  display: block;
-  font-size: 22px;
-  font-weight: 800;
-  color: #00ff88;
-  margin-bottom: 4px;
-}
-
-.landing-stat-label {
-  display: block;
-  font-size: 11px;
-  color: #444;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.landing-stat-divider {
-  width: 1px;
-  height: 36px;
-  background: rgba(255,255,255,0.06);
-}
-
-/* Section tag */
-.landing-section-tag {
-  font-size: 11px;
-  color: #00ff88;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-  font-weight: 700;
-}
-
-/* How it works */
-.landing-how {
-  padding: 80px 48px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.landing-how h2 {
-  font-size: 36px;
-  font-weight: 800;
-  margin-bottom: 56px;
-  color: #fff;
-  letter-spacing: -0.01em;
-}
-
-.landing-steps {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  max-width: 900px;
-}
-
-.landing-step {
-  flex: 1;
-  padding-right: 32px;
-}
-
-.landing-step-icon {
-  font-size: 32px;
-  margin-bottom: 12px;
-  display: block;
-}
-
-.landing-step-num {
-  display: block;
-  font-size: 11px;
-  color: #00ff88;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  margin-bottom: 10px;
-}
-
-.landing-step h3 {
-  font-size: 17px;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 10px;
-}
-
-.landing-step p {
-  font-size: 14px;
-  color: #555;
-  line-height: 1.7;
-}
-
-.landing-step-line {
-  width: 60px;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(0,255,136,0.3), rgba(0,255,136,0.1));
-  flex-shrink: 0;
-  margin: 0 16px;
-  margin-bottom: 60px;
-}
-
-/* Features */
-.landing-features {
-  padding: 80px 48px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.landing-features h2 {
-  font-size: 36px;
-  font-weight: 800;
-  margin-bottom: 48px;
-  line-height: 1.2;
-  color: #fff;
-  letter-spacing: -0.01em;
-}
-
-.landing-features-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  grid-template-rows: auto auto;
-  gap: 16px;
-  max-width: 1000px;
-}
-
-.landing-feature-card {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 12px;
-  padding: 28px;
-  transition: all 0.2s;
-}
-
-.landing-feature-card:hover {
-  border-color: rgba(0,255,136,0.15);
-  background: rgba(255,255,255,0.04);
-}
-
-.landing-feature-large {
-  grid-row: span 2;
-}
-
-.landing-feature-icon {
-  font-size: 28px;
-  display: block;
-  margin-bottom: 16px;
-}
-
-.landing-feature-card h3 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 10px;
-  color: #fff;
-}
-
-.landing-feature-card p {
-  font-size: 14px;
-  color: #555;
-  line-height: 1.7;
-}
-
-/* Contracts */
-.landing-contracts {
-  padding: 80px 48px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.landing-contracts h2 {
-  font-size: 36px;
-  font-weight: 800;
-  margin-bottom: 12px;
-  color: #fff;
-}
-
-.landing-contracts-sub {
-  font-size: 15px;
-  color: #555;
-  margin-bottom: 32px;
-}
-
-.landing-contract-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-width: 600px;
-}
-
-.landing-contract-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 10px;
-  padding: 18px 22px;
-  text-decoration: none;
-  transition: all 0.2s;
-}
-
-.landing-contract-item:hover {
-  border-color: rgba(0,255,136,0.2);
-  background: rgba(0,255,136,0.03);
-}
-
-.landing-contract-name {
-  display: block;
-  font-size: 14px;
-  color: #ccc;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.landing-contract-desc {
-  display: block;
-  font-size: 12px;
-  color: #444;
-}
-
-.landing-contract-addr {
-  font-size: 13px;
-  color: #00ff88;
-  font-family: monospace;
-  flex-shrink: 0;
-}
-
-/* CTA */
-.landing-cta {
-  padding: 100px 48px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  position: relative;
-  overflow: hidden;
-  background: radial-gradient(ellipse at 50% 100%, rgba(0,255,136,0.05) 0%, transparent 60%);
-}
-
-.landing-cta-glow {
-  position: absolute;
-  bottom: -100px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 300px;
-  background: radial-gradient(ellipse, rgba(0,255,136,0.08) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.landing-cta h2 {
-  font-size: 44px;
-  font-weight: 900;
-  line-height: 1.2;
-  margin-bottom: 20px;
-  color: #fff;
-  letter-spacing: -0.02em;
-}
-
-.landing-cta p {
-  font-size: 16px;
-  color: #555;
-  margin-bottom: 36px;
-}
-
-/* Footer */
-.landing-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 28px 48px;
-  color: #333;
-  font-size: 13px;
-}
-
-.landing-footer-logo {
-  display: block;
-  font-weight: 700;
-  color: #444;
-  margin-bottom: 6px;
-  font-size: 15px;
-}
-
-.landing-footer-left {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.landing-footer-right {
-  display: flex;
-  gap: 24px;
-}
-
-.landing-footer-right a {
-  color: #333;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.landing-footer-right a:hover {
-  color: #00ff88;
-}
-
-.match-total-pool {
-  font-size: 12px;
-  color: #555;
-  text-align: center;
-  margin-bottom: 8px;
-}
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import './Landing.css';
+
+function Landing() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="landing">
+
+      <nav className="landing-nav">
+        <div className="landing-logo">
+          <span>⚽</span>
+          <span className="landing-logo-text">GoalBet</span>
+          <span className="landing-logo-tag">BETA</span>
+        </div>
+        <div className="landing-nav-links">
+          <a href="https://x.com/GoalBetApp" target="_blank" rel="noreferrer">Twitter</a>
+          <a href="https://github.com/Megacollins/goalbet-frontend" target="_blank" rel="noreferrer">GitHub</a>
+          <button className="landing-launch-btn-sm" onClick={() => navigate('/app')}>
+            Open App
+          </button>
+        </div>
+      </nav>
+
+      <section className="landing-hero">
+        <div className="landing-hero-glow" />
+        <div className="landing-hero-content">
+          <div className="landing-live-badge">
+            <span className="landing-live-dot" />
+            LIVE · World Cup 2026
+          </div>
+          <h1>
+            The smartest way to<br />
+            <span className="landing-hero-highlight">predict football.</span>
+          </h1>
+          <p className="landing-hero-sub">
+            On-chain prediction markets for World Cup 2026.
+            Stake OKB, call the result, collect your winnings — no middlemen, no bookies.
+          </p>
+          <div className="landing-hero-actions">
+            <button className="landing-launch-btn" onClick={() => navigate('/app')}>
+              Start Predicting
+            </button>
+            
+              className="landing-ghost-btn"
+              href="https://www.okx.com/explorer/xlayer/address/0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278"
+              target="_blank"
+              rel="noreferrer"
+            >
+              View Contract
+            </a>
+          </div>
+        </div>
+
+        <div className="landing-odds-cards">
+          <div className="landing-odds-card">
+            <div className="landing-odds-match">Brazil vs Argentina</div>
+            <div className="landing-odds-row">
+              <div className="landing-odds-item active">
+                <span>Brazil</span>
+                <strong>2.10</strong>
+              </div>
+              <div className="landing-odds-item">
+                <span>Draw</span>
+                <strong>3.40</strong>
+              </div>
+              <div className="landing-odds-item">
+                <span>Argentina</span>
+                <strong>2.80</strong>
+              </div>
+            </div>
+          </div>
+          <div className="landing-odds-card landing-odds-card-2">
+            <div className="landing-odds-match">France vs England</div>
+            <div className="landing-odds-row">
+              <div className="landing-odds-item">
+                <span>France</span>
+                <strong>1.90</strong>
+              </div>
+              <div className="landing-odds-item">
+                <span>Draw</span>
+                <strong>3.20</strong>
+              </div>
+              <div className="landing-odds-item active">
+                <span>England</span>
+                <strong>3.10</strong>
+              </div>
+            </div>
+          </div>
+          <div className="landing-odds-card landing-odds-card-3">
+            <div className="landing-odds-match">Germany vs Spain</div>
+            <div className="landing-odds-row">
+              <div className="landing-odds-item">
+                <span>Germany</span>
+                <strong>2.40</strong>
+              </div>
+              <div className="landing-odds-item active">
+                <span>Draw</span>
+                <strong>3.10</strong>
+              </div>
+              <div className="landing-odds-item">
+                <span>Spain</span>
+                <strong>2.20</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="landing-stats-bar">
+        <div className="landing-stat-item">
+          <span className="landing-stat-num">12+</span>
+          <span className="landing-stat-label">Live Markets</span>
+        </div>
+        <div className="landing-stat-divider" />
+        <div className="landing-stat-item">
+          <span className="landing-stat-num">OKB</span>
+          <span className="landing-stat-label">Native Token</span>
+        </div>
+        <div className="landing-stat-divider" />
+        <div className="landing-stat-item">
+          <span className="landing-stat-num">5%</span>
+          <span className="landing-stat-label">Platform Fee</span>
+        </div>
+        <div className="landing-stat-divider" />
+        <div className="landing-stat-item">
+          <span className="landing-stat-num">ERC-1155</span>
+          <span className="landing-stat-label">NFT Badges</span>
+        </div>
+        <div className="landing-stat-divider" />
+        <div className="landing-stat-item">
+          <span className="landing-stat-num">X Layer</span>
+          <span className="landing-stat-label">Blockchain</span>
+        </div>
+      </div>
+
+      <section className="landing-how">
+        <p className="landing-section-tag">How it works</p>
+        <h2>Three steps. That's it.</h2>
+        <div className="landing-steps">
+          <div className="landing-step">
+            <div className="landing-step-icon">🔗</div>
+            <span className="landing-step-num">01</span>
+            <h3>Connect Wallet</h3>
+            <p>Use OKX Wallet on X Layer. Takes 30 seconds if you haven't done it before.</p>
+          </div>
+          <div className="landing-step-line" />
+          <div className="landing-step">
+            <div className="landing-step-icon">⚽</div>
+            <span className="landing-step-num">02</span>
+            <h3>Pick and Stake</h3>
+            <p>Browse live World Cup matches. Pick Team A, Draw, or Team B and stake OKB.</p>
+          </div>
+          <div className="landing-step-line" />
+          <div className="landing-step">
+            <div className="landing-step-icon">🏆</div>
+            <span className="landing-step-num">03</span>
+            <h3>Win and Collect</h3>
+            <p>Correct predictions earn OKB payouts and exclusive NFT fan badges.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="landing-features">
+        <p className="landing-section-tag">Why GoalBet</p>
+        <h2>No account. No KYC. Just a wallet.</h2>
+        <div className="landing-features-grid">
+          <div className="landing-feature-card landing-feature-large">
+            <span className="landing-feature-icon">⛓️</span>
+            <h3>Fully On-Chain</h3>
+            <p>Every bet, every payout, every market lives on X Layer. No servers, no databases, no trust required. Verify anything on OKX Explorer.</p>
+          </div>
+          <div className="landing-feature-card">
+            <span className="landing-feature-icon">🎖️</span>
+            <h3>NFT Fan Badges</h3>
+            <p>Win matches and collect ERC-1155 badges as proof of your predictions.</p>
+          </div>
+          <div className="landing-feature-card">
+            <span className="landing-feature-icon">💰</span>
+            <h3>Fair Payouts</h3>
+            <p>Winners split 95% of the pool proportionally. Simple math, no surprises.</p>
+          </div>
+          <div className="landing-feature-card">
+            <span className="landing-feature-icon">🤖</span>
+            <h3>AI Agent</h3>
+            <p>Our AI agent auto-creates markets from live World Cup fixture data.</p>
+          </div>
+          <div className="landing-feature-card">
+            <span className="landing-feature-icon">🔐</span>
+            <h3>Non-Custodial</h3>
+            <p>Your funds never leave your wallet until you place a bet. You stay in control.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="landing-contracts">
+        <p className="landing-section-tag">Transparent</p>
+        <h2>Verified on X Layer</h2>
+        <p className="landing-contracts-sub">
+          Both contracts are open source and verified on OKX Explorer.
+        </p>
+        <div className="landing-contract-list">
+          <a href="https://www.okx.com/explorer/xlayer/address/0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278" target="_blank" rel="noreferrer" className="landing-contract-item">
+            <div>
+              <span className="landing-contract-name">PredictionMarket.sol</span>
+              <span className="landing-contract-desc">Handles all bets, markets and payouts</span>
+            </div>
+            <span className="landing-contract-addr">0x0d8C...D278 ↗</span>
+          </a>
+          <a href="https://www.okx.com/explorer/xlayer/address/0x9CC371D5a337cdbaE3e37B0b8EBD6E47f3101C9f" target="_blank" rel="noreferrer" className="landing-contract-item">
+            <div>
+              <span className="landing-contract-name">FanBadge.sol (ERC-1155)</span>
+              <span className="landing-contract-desc">Mints NFT badges to winning predictors</span>
+            </div>
+            <span className="landing-contract-addr">0x9CC3...C9f ↗</span>
+          </a>
+        </div>
+      </section>
+
+      <section className="landing-cta">
+        <div className="landing-cta-glow" />
+        <h2>The World Cup is here. Are you in?</h2>
+        <p>No sign up. No KYC. Just connect your OKX Wallet and start predicting.</p>
+        <button className="landing-launch-btn" onClick={() => navigate('/app')}>
+          Start Predicting
+        </button>
+      </section>
+
+      <footer className="landing-footer">
+        <div className="landing-footer-left">
+          <span className="landing-footer-logo">⚽ GoalBet</span>
+          <span>Built on X Layer · Powered by OKB · World Cup 2026</span>
+        </div>
+        <div className="landing-footer-right">
+          <a href="https://x.com/GoalBetApp" target="_blank" rel="noreferrer">Twitter</a>
+          <a href="https://github.com/Megacollins/goalbet-frontend" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="https://www.okx.com/explorer/xlayer/address/0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278" target="_blank" rel="noreferrer">Explorer</a>
+        </div>
+      </footer>
+
+    </div>
+  );
+}
+
+export default Landing;

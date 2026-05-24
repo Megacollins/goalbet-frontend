@@ -21,9 +21,6 @@ function Landing() {
       </nav>
 
       <section className="landing-hero">
-        <div className="landing-hero-image">
-          <img src="/hero.jpg" alt="GoalBet" className="landing-hero-img" />
-        </div>
         <p className="landing-hero-tag">Built on X Layer · World Cup 2026</p>
         <h1>Put your predictions<br /><span className="landing-hero-highlight">where your mouth is.</span></h1>
         <p className="landing-hero-sub">

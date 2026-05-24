@@ -65,26 +65,24 @@
 }
 
 .landing-hero {
-  padding: 60px 48px 80px;
-  max-width: 860px;
+  padding: 0 0 80px 0;
+  max-width: 100%;
   border-bottom: 1px solid #151515;
 }
 
 .landing-hero-image {
   width: 100%;
-  max-height: 420px;
+  height: 520px;
   overflow: hidden;
-  border-radius: 16px;
-  margin-bottom: 48px;
-  border: 1px solid #1a1a1a;
+  margin-bottom: 56px;
+  border-bottom: 1px solid #1a1a1a;
 }
 
 .landing-hero-img {
   width: 100%;
-  height: 420px;
+  height: 100%;
   object-fit: cover;
-  object-position: center;
-  border-radius: 16px;
+  object-position: center top;
   display: block;
 }
 
@@ -93,6 +91,7 @@
   color: #00ff88;
   margin-bottom: 20px;
   letter-spacing: 0.05em;
+  padding-left: 48px;
 }
 
 .landing-hero h1 {
@@ -101,6 +100,7 @@
   line-height: 1.1;
   margin-bottom: 24px;
   color: #fff;
+  padding-left: 48px;
 }
 
 .landing-hero-highlight {
@@ -113,6 +113,7 @@
   line-height: 1.7;
   margin-bottom: 36px;
   max-width: 540px;
+  padding-left: 48px;
 }
 
 .landing-launch-btn {
@@ -126,6 +127,7 @@
   font-size: 16px;
   transition: all 0.2s;
   display: inline-block;
+  margin-left: 48px;
 }
 
 .landing-launch-btn:hover {

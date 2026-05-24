@@ -25,7 +25,9 @@ const FLAG_CODES = {
   "Denmark": "dk", "Poland": "pl", "Saudi Arabia": "sa", "Algeria": "dz",
   "Turkey": "tr", "Chile": "cl", "Egypt": "eg", "New Zealand": "nz",
   "Romania": "ro", "Venezuela": "ve", "Hungary": "hu", "Peru": "pe",
-  "Ivory Coast": "ci", "Czech Republic": "cz"
+  "Ivory Coast": "ci", "Czech Republic": "cz", "Czechia": "cz",
+  "Bosnia-Herzegovina": "ba", "Paraguay": "py", "Qatar": "qa",
+  "Switzerland": "ch", "Canada": "ca"
 };
 
 const getFlag = (teamName) => FLAG_CODES[teamName] || "un";
@@ -67,10 +69,17 @@ function App() {
         provider
       );
       const count = await readContract.marketCount();
-      const marketList = [];
       const hidden = JSON.parse(localStorage.getItem('hiddenMarkets') || '[]');
+
+      // Fetch all markets in parallel
+      const promises = [];
       for (let i = 1; i <= Number(count); i++) {
-        const market = await readContract.getMarket(i);
+        promises.push(readContract.getMarket(i));
+      }
+      const allMarkets = await Promise.all(promises);
+
+      const marketList = [];
+      for (const market of allMarkets) {
         if (!market.resolved && !hidden.includes(Number(market.id))) {
           marketList.push({
             id: Number(market.id),
@@ -108,15 +117,28 @@ function App() {
         provider
       );
       const count = await readContract.marketCount();
+
+      // Fetch all bets and markets in parallel
+      const betPromises = [];
+      const marketPromises = [];
+      for (let i = 1; i <= Number(count); i++) {
+        betPromises.push(contractInstance.getBet(i, userAccount));
+        marketPromises.push(readContract.getMarket(i));
+      }
+      const allBets = await Promise.all(betPromises);
+      const allBetMarkets = await Promise.all(marketPromises);
+
       const activeBets = [];
       const historyBets = [];
 
-      for (let i = 1; i <= Number(count); i++) {
-        const bet = await contractInstance.getBet(i, userAccount);
+      for (let i = 0; i < allBets.length; i++) {
+        const bet = allBets[i];
+        const market = allBetMarkets[i];
+        const marketId = i + 1;
+
         if (bet.amount.toString() !== "0") {
-          const market = await readContract.getMarket(i);
           const betData = {
-            matchId: i,
+            matchId: marketId,
             match: {
               teamA: market.teamA,
               teamB: market.teamB,
@@ -392,10 +414,7 @@ function App() {
             <div className="bets-section">
               <div className="bets-header">
                 <h2>Bet History</h2>
-                <button
-                  className="refresh-btn"
-                  onClick={() => setShowHistory(!showHistory)}
-                >
+                <button className="refresh-btn" onClick={() => setShowHistory(!showHistory)}>
                   {showHistory ? '🙈 Hide' : '👁 Show'}
                 </button>
               </div>

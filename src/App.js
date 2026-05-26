@@ -97,6 +97,7 @@ function App() {
   const [markets, setMarkets] = useState([]);
   const [loadingMarkets, setLoadingMarkets] = useState(true);
   const [showHistory, setShowHistory] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const fetchMarkets = useCallback(async () => {
     try {
@@ -359,12 +360,49 @@ function App() {
 
   return (
     <div className="app">
+
+      {/* Sidebar Overlay */}
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar */}
+      <div className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
+        <div className="sidebar-header">
+          <span className="sidebar-logo">⚽ GoalBet</span>
+          <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>✕</button>
+        </div>
+        <div className="sidebar-divider" />
+        <nav className="sidebar-nav">
+          <button className="sidebar-link" onClick={() => { navigate('/'); setSidebarOpen(false); }}>
+            🏠 Home
+          </button>
+          <button className="sidebar-link" onClick={() => { navigate('/leaderboard'); setSidebarOpen(false); }}>
+            🏆 Leaderboard
+          </button>
+          <button className="sidebar-link" onClick={() => {
+            setSidebarOpen(false);
+            setTimeout(() => {
+              const el = document.getElementById('bet-history');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+              else setShowHistory(true);
+            }, 100);
+          }}>
+            📜 Bet History
+          </button>
+        </nav>
+      </div>
+
       <header className="header">
-        <div className="logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-          <span className="logo-icon">⚽</span>
-          <span className="logo-text">GoalBet</span>
-          <span className="logo-badge">X Layer</span>
-          <button className="leaderboard-link" onClick={(e) => { e.stopPropagation(); navigate('/leaderboard'); }}>🏆 Leaderboard</button>
+        <div className="header-left">
+          <button className="hamburger" onClick={() => setSidebarOpen(true)}>
+            ☰
+          </button>
+          <div className="logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+            <span className="logo-icon">⚽</span>
+            <span className="logo-text">GoalBet</span>
+            <span className="logo-badge">X Layer</span>
+          </div>
         </div>
         {account ? (
           <div className="account-wrapper">
@@ -462,28 +500,27 @@ function App() {
             )}
           </div>
 
-          {pastBets.length > 0 && (
-            <div className="bets-section">
-              <div className="bets-header">
-                <h2>Bet History</h2>
-                <button className="refresh-btn" onClick={() => setShowHistory(!showHistory)}>
-                  {showHistory ? '🙈 Hide' : '👁 Show'}
-                </button>
-              </div>
-              {showHistory && (
-                <div className="bets-grid">
-                  {pastBets.map((bet) => (
-                    <BetCard key={bet.matchId} bet={bet} showClaim={false} />
-                  ))}
-                </div>
-              )}
-              {!showHistory && (
-                <div className="bets-empty" style={{ cursor: 'pointer' }} onClick={() => setShowHistory(true)}>
-                  {pastBets.length} past bet{pastBets.length > 1 ? 's' : ''} — click Show to view
-                </div>
-              )}
+          <div id="bet-history" className="bets-section">
+            <div className="bets-header">
+              <h2>Bet History</h2>
+              <button className="refresh-btn" onClick={() => setShowHistory(!showHistory)}>
+                {showHistory ? '🙈 Hide' : '👁 Show'}
+              </button>
             </div>
-          )}
+            {pastBets.length === 0 ? (
+              <div className="bets-empty">No past bets yet.</div>
+            ) : showHistory ? (
+              <div className="bets-grid">
+                {pastBets.map((bet) => (
+                  <BetCard key={bet.matchId} bet={bet} showClaim={false} />
+                ))}
+              </div>
+            ) : (
+              <div className="bets-empty" style={{ cursor: 'pointer' }} onClick={() => setShowHistory(true)}>
+                {pastBets.length} past bet{pastBets.length > 1 ? 's' : ''} — click Show to view
+              </div>
+            )}
+          </div>
         </>
       )}
 

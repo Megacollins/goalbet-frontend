@@ -364,6 +364,7 @@ function App() {
           <span className="logo-icon">⚽</span>
           <span className="logo-text">GoalBet</span>
           <span className="logo-badge">X Layer</span>
+          <button className="leaderboard-link" onClick={(e) => { e.stopPropagation(); navigate('/leaderboard'); }}>🏆 Leaderboard</button>
         </div>
         {account ? (
           <div className="account-wrapper">

@@ -5,6 +5,7 @@ import './index.css';
 import Landing from './Landing';
 import App from './App';
 import Admin from './Admin';
+import Leaderboard from './Leaderboard';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,6 +15,7 @@ root.render(
         <Route path="/" element={<Landing />} />
         <Route path="/app" element={<App />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

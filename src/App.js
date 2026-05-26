@@ -32,6 +32,37 @@ const FLAG_CODES = {
 
 const getFlag = (teamName) => FLAG_CODES[teamName] || "un";
 
+const useCountdown = (matchDate) => {
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    const calculate = () => {
+      const now = new Date().getTime();
+      const match = new Date(matchDate + " 18:00:00 UTC").getTime();
+      const diff = match - now;
+
+      if (diff <= 0) {
+        setTimeLeft('Started');
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+      if (days > 0) setTimeLeft(`${days}d ${hours}h`);
+      else if (hours > 0) setTimeLeft(`${hours}h ${mins}m`);
+      else setTimeLeft(`${mins}m`);
+    };
+
+    calculate();
+    const timer = setInterval(calculate, 60000);
+    return () => clearInterval(timer);
+  }, [matchDate]);
+
+  return timeLeft;
+};
+
 const Flag = ({ code, alt }) => (
   <img
     className="flag"
@@ -40,6 +71,14 @@ const Flag = ({ code, alt }) => (
     onError={(e) => { e.target.style.display = 'none'; }}
   />
 );
+
+const MatchCountdown = ({ date }) => {
+  const timeLeft = useCountdown(date);
+  if (!timeLeft) return null;
+  return (
+    <span className="match-countdown">⏱ {timeLeft}</span>
+  );
+};
 
 function App() {
   const navigate = useNavigate();
@@ -71,7 +110,6 @@ function App() {
       const count = await readContract.marketCount();
       const hidden = JSON.parse(localStorage.getItem('hiddenMarkets') || '[]');
 
-      // Fetch all markets in parallel
       const promises = [];
       for (let i = 1; i <= Number(count); i++) {
         promises.push(readContract.getMarket(i));
@@ -118,7 +156,6 @@ function App() {
       );
       const count = await readContract.marketCount();
 
-      // Fetch all bets and markets in parallel
       const betPromises = [];
       const marketPromises = [];
       for (let i = 1; i <= Number(count); i++) {
@@ -273,6 +310,12 @@ function App() {
     return "Unknown";
   };
 
+  const shareBet = (bet) => {
+    const outcome = getOutcomeLabel(bet.choice, bet.match);
+    const text = `I just bet on ${bet.match.teamA} vs ${bet.match.teamB} — picking ${outcome} on GoalBet ⚽\n\nOn-chain prediction market built on @XLayerOfficial\n\n🌐 goalbet-umber.vercel.app\n\n#GoalBet #XLayer #WorldCup2026`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
   const BetCard = ({ bet, showClaim = false }) => {
     const status = getBetStatus(bet);
     return (
@@ -296,15 +339,20 @@ function App() {
             <span className="bet-value" style={{ color: status.color }}>{status.label}</span>
           </div>
         </div>
-        {showClaim && bet.resolved && bet.choice === bet.result && !bet.claimed && (
-          <button
-            className="claim-btn"
-            onClick={() => claimWinnings(bet.matchId)}
-            disabled={claimingId === bet.matchId}
-          >
-            {claimingId === bet.matchId ? "Claiming..." : "💰 Claim Winnings"}
+        <div className="bet-card-actions">
+          {showClaim && bet.resolved && bet.choice === bet.result && !bet.claimed && (
+            <button
+              className="claim-btn"
+              onClick={() => claimWinnings(bet.matchId)}
+              disabled={claimingId === bet.matchId}
+            >
+              {claimingId === bet.matchId ? "Claiming..." : "💰 Claim Winnings"}
+            </button>
+          )}
+          <button className="share-btn" onClick={() => shareBet(bet)}>
+            🐦 Share
           </button>
-        )}
+        </div>
       </div>
     );
   };
@@ -366,7 +414,10 @@ function App() {
                 className={`match-card ${selectedMatch?.id === match.id ? 'selected' : ''}`}
                 onClick={() => { setSelectedMatch(match); setSelectedOutcome(null); }}
               >
-                <div className="match-date">📅 {match.date}</div>
+                <div className="match-date">
+                  📅 {match.date}
+                  <MatchCountdown date={match.date} />
+                </div>
                 <div className="match-teams">
                   <div className="team">
                     <Flag code={match.flagA} alt={match.teamA} />

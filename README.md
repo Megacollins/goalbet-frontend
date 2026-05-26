@@ -1,70 +1,133 @@
-# Getting Started with Create React App
+# ⚽ GoalBet — World Cup 2026 Prediction Market
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+> Built on X Layer Mainnet for the XCup Hackathon
 
-## Available Scripts
+GoalBet is a fully on-chain outcome prediction market for World Cup 2026 matches. Users stake OKB on match outcomes, winners claim proportional payouts, and correct predictors earn exclusive NFT fan badges — all without accounts, KYC, or middlemen.
 
-In the project directory, you can run:
+GoalBet is a real-world example of the permissionless outcome market vision described in the X Layer Exchange OS whitepaper.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 🌐 Live
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **App:** https://goalbet-umber.vercel.app
+- **Betting:** https://goalbet-umber.vercel.app/app
+- **Leaderboard:** https://goalbet-umber.vercel.app/leaderboard
+- **Admin:** https://goalbet-umber.vercel.app/admin
+- **Twitter:** [@GoalBetApp](https://x.com/GoalBetApp)
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 📄 Contracts (X Layer Mainnet — ChainID 196)
 
-### `npm run build`
+| Contract | Address |
+|---|---|
+| PredictionMarket.sol | [0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278](https://www.okx.com/explorer/xlayer/address/0x0d8C307303C17cfe4c1Bbe1A023C45B230F6D278) |
+| FanBadge.sol (ERC-1155) | [0x9CC371D5a337cdbaE3e37B0b8EBD6E47f3101C9f](https://www.okx.com/explorer/xlayer/address/0x9CC371D5a337cdbaE3e37B0b8EBD6E47f3101C9f) |
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Both contracts are verified on OKX Explorer.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## ✨ Features
 
-### `npm run eject`
+- **On-chain prediction markets** — Bet on World Cup match outcomes (Team A / Draw / Team B)
+- **OKB staking** — Stake native OKB tokens on predictions
+- **Proportional payouts** — Winners split 95% of the pool proportionally
+- **NFT fan badges** — ERC-1155 badges minted to correct predictors
+- **AI Agent** — Auto-creates markets from live World Cup fixture data
+- **Leaderboard** — Ranked by correct predictions and accuracy %
+- **Bet history** — Track all past predictions
+- **Countdown timers** — Live countdown to each match
+- **Share bets** — Share predictions directly to Twitter
+- **No KYC** — Just connect your OKX Wallet and go
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🛠 Tech Stack
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+| Layer | Technology |
+|---|---|
+| Blockchain | X Layer Mainnet (ChainID 196) |
+| Smart Contracts | Solidity 0.8.28 |
+| Contract Framework | Hardhat |
+| Frontend | React 18 |
+| Blockchain Library | ethers.js v5.7.2 |
+| Routing | react-router-dom v6 |
+| Wallet | OKX Wallet |
+| Deployment | Vercel |
+| NFT Standard | ERC-1155 |
+| AI Agent | Node.js |
+| Fixtures API | football-data.org |
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## 🏗 How It Works
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. **Connect** your OKX Wallet on X Layer
+2. **Pick** an upcoming World Cup match
+3. **Stake** OKB on your predicted outcome
+4. **Wait** for the match to finish
+5. **Claim** your OKB winnings + NFT badge if you called it right
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## 🤖 AI Agent
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The AI Agent automatically creates new prediction markets from World Cup 2026 fixture data. Run it from the admin panel or via terminal:
 
-### Analyzing the Bundle Size
+```bash
+cd goalbet
+node agent.js
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+## 🚀 Running Locally
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+# Clone the repo
+git clone https://github.com/Megacollins/goalbet-frontend.git
+cd goalbet-frontend
 
-### Advanced Configuration
+# Install dependencies
+npm install --legacy-peer-deps
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+# Start development server
+npm start
+```
 
-### Deployment
+App runs on `http://localhost:3000`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+---
 
-### `npm run build` fails to minify
+## 📐 Architecture
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **PredictionMarket.sol** — Handles market creation, bet placement, resolution and payouts
+- **FanBadge.sol** — ERC-1155 NFT contract, mints badges to winners after each market resolves
+- **React Frontend** — Reads markets from blockchain, connects to OKX Wallet for transactions
+- **Admin Panel** — Owner-protected dashboard for market management and AI agent
+- **AI Agent** — Node.js script that fetches fixtures and calls createMarket() on-chain
+
+---
+
+## 🔮 Roadmap
+
+- [ ] USDC support alongside OKB
+- [ ] Mobile app (React Native)
+- [ ] Accumulator/parlay betting
+- [ ] The Graph integration for faster indexing
+- [ ] Cross-chain via OKX Bridge
+- [ ] Governance token
+
+---
+
+## 🏆 XCup Hackathon
+
+Built for the X Layer XCup Hackathon — May 2026.
+
+GoalBet demonstrates how Exchange OS's vision of permissionless outcome markets can be realized on X Layer today. Anyone can create a market, anyone can bet, everything settles on-chain.
+
+---
+
+*Built on X Layer · Powered by OKB · World Cup 2026*

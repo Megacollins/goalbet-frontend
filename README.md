@@ -2,6 +2,9 @@
 
 > Built on X Layer Mainnet for the XCup Hackathon
 
+## 🎥 Demo Video
+[![GoalBet Demo](https://img.youtube.com/vi/naoqx6AVHHU/0.jpg)](https://youtu.be/naoqx6AVHHU?si=hLEIeGzLnuoBVLMY)
+
 GoalBet is a fully on-chain outcome prediction market for World Cup 2026 matches. Users stake OKB on match outcomes, winners claim proportional payouts, and correct predictors earn exclusive NFT fan badges — all without accounts, KYC, or middlemen.
 
 GoalBet is a real-world example of the permissionless outcome market vision described in the X Layer Exchange OS whitepaper.
